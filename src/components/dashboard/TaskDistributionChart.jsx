@@ -157,14 +157,15 @@ const TaskDistributionChart = ({ tasks }) => {
           <div className="text-2xl font-bold text-red-600">
             {tasks.filter(task => 
               task.status !== 'done' && 
-              task.dueDate && 
-              new Date(task.dueDate) < new Date()
+              task.due_date && 
+              new Date(task.due_date) < new Date()
             ).length}
           </div>
           <div className="text-sm text-gray-600">Overdue</div>
         </div>
       </div>
-      </div>
+    </div>
+  );
+};
 
-  )};
-  export default TaskDistributionChart
+export default TaskDistributionChart;

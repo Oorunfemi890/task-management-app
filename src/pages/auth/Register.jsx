@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { Eye, EyeOff, Mail, Lock, User, Building } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Building, AlertCircle } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,6 +29,13 @@ const Register = () => {
       setErrors(prev => ({
         ...prev,
         [name]: ''
+      }));
+    }
+    // Clear submit error when user starts typing
+    if (errors.submit) {
+      setErrors(prev => ({
+        ...prev,
+        submit: ''
       }));
     }
   };
@@ -69,6 +76,9 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Clear previous submit errors
+    setErrors(prev => ({ ...prev, submit: '' }));
+    
     if (!validateForm()) return;
 
     try {
@@ -76,6 +86,8 @@ const Register = () => {
       await register(userData);
       navigate('/');
     } catch (error) {
+      // The error message will be displayed via toast (from AuthContext)
+      // But also show it in the form for better UX
       setErrors({ submit: error.message });
     }
   };
@@ -103,8 +115,12 @@ const Register = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {errors.submit && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-              {errors.submit}
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-start">
+              <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <h3 className="text-sm font-medium">Registration Failed</h3>
+                <p className="text-sm mt-1">{errors.submit}</p>
+              </div>
             </div>
           )}
 
@@ -153,7 +169,7 @@ const Register = () => {
                   autoComplete="email"
                   required
                   className={`appearance-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
+                    errors.email || errors.submit?.includes('Email') ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Email address"
                   value={formData.email}

@@ -49,6 +49,33 @@ const authReducer = (state, action) => {
   }
 };
 
+// Helper function to extract error message from different error formats
+const getErrorMessage = (error) => {
+  // If it's an axios error with response data
+  if (error.response?.data) {
+    // Check for validation errors with details
+    if (error.response.data.details && Array.isArray(error.response.data.details)) {
+      return error.response.data.details.join(', ');
+    }
+    // Check for single error message
+    if (error.response.data.error) {
+      return error.response.data.error;
+    }
+    // Check for message field
+    if (error.response.data.message) {
+      return error.response.data.message;
+    }
+  }
+  
+  // If it's a direct error message
+  if (error.message) {
+    return error.message;
+  }
+  
+  // Default fallback
+  return 'An unexpected error occurred';
+};
+
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
@@ -64,6 +91,7 @@ export const AuthProvider = ({ children }) => {
             payload: { user, token },
           });
         } catch (error) {
+          console.error('Auth initialization error:', error);
           localStorage.removeItem("token");
           dispatch({ type: "LOGIN_FAILURE" });
         }
@@ -80,7 +108,6 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOADING" });
     try {
       const data = await authService.login(credentials); 
-      // Expecting backend to return { token, user }
       localStorage.setItem("token", data.token);
       dispatch({
         type: "LOGIN_SUCCESS",
@@ -90,8 +117,10 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
-      toast.error(error.response?.data?.message || error.message || "Login failed");
-      throw error;
+      const errorMessage = getErrorMessage(error);
+      console.error('Login error:', error);
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
@@ -100,7 +129,6 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOADING" });
     try {
       const data = await authService.register(userData);
-      // Expecting backend to return { token, user }
       localStorage.setItem("token", data.token);
       dispatch({
         type: "LOGIN_SUCCESS",
@@ -110,8 +138,10 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
-      toast.error(error.response?.data?.message || error.message || "Registration failed");
-      throw error;
+      const errorMessage = getErrorMessage(error);
+      console.error('Registration error:', error);
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 

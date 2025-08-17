@@ -1,4 +1,3 @@
-// 2. Fix authService.js - Update API endpoints
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
@@ -36,6 +35,7 @@ class AuthService {
 
     async login(credentials) {
         try {
+            console.log('Logging in user with credentials:', { email: credentials.email }); // Debug log (don't log password)
             const response = await axios.post(API_URL + "login", credentials);
             
             // Since your backend doesn't return a token yet, let's simulate one
@@ -47,12 +47,20 @@ class AuthService {
             
             return result;
         } catch (error) {
+            console.error('Login error:', error.response?.data || error.message); // Debug log
             throw error;
         }
     }
 
     async register(userData) {
         try {
+            console.log('Registering user with data:', { 
+                name: userData.name, 
+                email: userData.email,
+                company: userData.company,
+                role: userData.role 
+            }); // Debug log (don't log password)
+            
             const response = await axios.post(API_URL + "register", userData);
             
             // Since your backend doesn't return a token yet, let's simulate one
@@ -64,6 +72,7 @@ class AuthService {
             
             return result;
         } catch (error) {
+            console.error('Registration error:', error.response?.data || error.message); // Debug log
             throw error;
         }
     }
@@ -96,6 +105,57 @@ class AuthService {
                 Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(userData)
+        });
+
+        return response;
+    }
+
+    async changePassword(passwordData) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
+
+        const response = await this.apiCall('/auth/change-password', {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(passwordData)
+        });
+
+        return response;
+    }
+
+    async forgotPassword(email) {
+        const response = await this.apiCall('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+        });
+
+        return response;
+    }
+
+    async resetPassword(token, newPassword) {
+        const response = await this.apiCall('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ token, newPassword })
+        });
+
+        return response;
+    }
+
+    async refreshToken() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
+
+        const response = await this.apiCall('/auth/refresh', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
 
         return response;
