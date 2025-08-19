@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@context/AuthContext';
 import { useTask } from '@context/TaskContext';
+import { authService } from '@services/authService';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Mail, 
@@ -17,24 +20,45 @@ import {
   Target,
   TrendingUp,
   Award,
-  Activity
+  Activity,
+  Loader,
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
   const { tasks, projects } = useTask();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    company: user?.company || '',
-    location: user?.location || '',
-    bio: user?.bio || '',
-    title: user?.title || '',
-    timezone: user?.timezone || 'UTC'
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    location: '',
+    bio: '',
+    title: '',
+    timezone: 'UTC'
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Initialize form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        company: user.company || '',
+        location: user.location || '',
+        bio: user.bio || '',
+        title: user.title || '',
+        timezone: user.timezone || 'UTC'
+      });
+    }
+  }, [user]);
 
   const userTasks = tasks.filter(task => task.assignee === user?.id);
   const completedTasks = userTasks.filter(task => task.status === 'done');
@@ -53,43 +77,134 @@ const Profile = () => {
     completionRate: userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0
   };
 
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      errors.phone = 'Please enter a valid phone number';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
+    if (!validateForm()) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    setIsSaving(true);
     try {
-      await updateUser(formData);
+      // Call the API to update profile
+      const response = await authService.updateProfile(formData);
+      
+      // Update the user in context
+      updateUser(response.user || response);
+      
       setIsEditing(false);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
+      toast.error(error.message || 'Failed to update profile');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
-    setFormData({
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      company: user?.company || '',
-      location: user?.location || '',
-      bio: user?.bio || '',
-      title: user?.title || '',
-      timezone: user?.timezone || 'UTC'
-    });
+    // Reset form data to original user data
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        company: user.company || '',
+        location: user.location || '',
+        bio: user.bio || '',
+        title: user.title || '',
+        timezone: user.timezone || 'UTC'
+      });
+    }
+    setValidationErrors({});
     setIsEditing(false);
+  };
+
+  const handleExportData = async () => {
+    try {
+      await authService.exportUserData();
+      toast.success('Data exported successfully!');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast.error('Failed to export data');
+    }
   };
 
   const recentTasks = userTasks
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
     .slice(0, 5);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'done':
+        return 'bg-green-500';
+      case 'inprogress':
+        return 'bg-blue-500';
+      case 'review':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-400';
+    }
+  };
+
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case 'done':
+        return 'bg-green-100 text-green-800';
+      case 'inprogress':
+        return 'bg-blue-100 text-blue-800';
+      case 'review':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader className="h-8 w-8 animate-spin text-primary-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -100,7 +215,7 @@ const Profile = () => {
         
         {/* Profile Info */}
         <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <div className="flex items-center space-x-4">
               {/* Profile Picture */}
               <div className="relative -mt-16">
@@ -117,7 +232,7 @@ const Profile = () => {
               </div>
 
               {/* Basic Info */}
-              <div className="mt-4">
+              <div className="mt-4 sm:mt-0">
                 <h1 className="text-2xl font-bold text-gray-900">
                   {user?.name || 'User Name'}
                 </h1>
@@ -130,11 +245,11 @@ const Profile = () => {
             </div>
 
             {/* Edit Button */}
-            <div>
+            <div className="mt-4 sm:mt-0">
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="btn-outline flex items-center space-x-2"
+                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2"
                 >
                   <Edit className="h-4 w-4" />
                   <span>Edit Profile</span>
@@ -143,22 +258,23 @@ const Profile = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={handleCancel}
-                    className="btn-outline flex items-center space-x-2"
+                    disabled={isSaving}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <X className="h-4 w-4" />
                     <span>Cancel</span>
                   </button>
                   <button
                     onClick={handleSave}
-                    disabled={isLoading}
-                    className="btn-primary flex items-center space-x-2"
+                    disabled={isSaving}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? (
-                      <div className="spinner" />
+                    {isSaving ? (
+                      <Loader className="h-4 w-4 animate-spin" />
                     ) : (
                       <Save className="h-4 w-4" />
                     )}
-                    <span>Save</span>
+                    <span>{isSaving ? 'Saving...' : 'Save'}</span>
                   </button>
                 </div>
               )}
@@ -179,16 +295,25 @@ const Profile = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <User className="inline h-4 w-4 mr-1" />
-                    Full Name
+                    Full Name *
                   </label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="input-field"
-                    />
+                    <div>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                          validationErrors.name ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your full name"
+                        required
+                      />
+                      {validationErrors.name && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-gray-900">{user?.name || 'Not provided'}</p>
                   )}
@@ -197,16 +322,25 @@ const Profile = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <Mail className="inline h-4 w-4 mr-1" />
-                    Email
+                    Email *
                   </label>
                   {isEditing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="input-field"
-                    />
+                    <div>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                          validationErrors.email ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your email"
+                        required
+                      />
+                      {validationErrors.email && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-gray-900">{user?.email || 'Not provided'}</p>
                   )}
@@ -220,14 +354,21 @@ const Profile = () => {
                     Phone
                   </label>
                   {isEditing ? (
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="input-field"
-                      placeholder="Enter phone number"
-                    />
+                    <div>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                          validationErrors.phone ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter phone number"
+                      />
+                      {validationErrors.phone && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.phone}</p>
+                      )}
+                    </div>
                   ) : (
                     <p className="text-gray-900">{user?.phone || 'Not provided'}</p>
                   )}
@@ -244,7 +385,7 @@ const Profile = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      className="input-field"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                       placeholder="City, Country"
                     />
                   ) : (
@@ -264,7 +405,7 @@ const Profile = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleInputChange}
-                      className="input-field"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                       placeholder="Your job title"
                     />
                   ) : (
@@ -283,7 +424,7 @@ const Profile = () => {
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className="input-field"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                       placeholder="Company name"
                     />
                   ) : (
@@ -302,7 +443,7 @@ const Profile = () => {
                     value={formData.bio}
                     onChange={handleInputChange}
                     rows={4}
-                    className="input-field"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                     placeholder="Tell us about yourself..."
                   />
                 ) : (
@@ -319,7 +460,7 @@ const Profile = () => {
                     name="timezone"
                     value={formData.timezone}
                     onChange={handleInputChange}
-                    className="input-field"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                   >
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">Eastern Time (ET)</option>
@@ -354,26 +495,16 @@ const Profile = () => {
             ) : (
               <div className="space-y-3">
                 {recentTasks.map((task) => (
-                  <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div className={`w-2 h-2 rounded-full ${
-                      task.status === 'done' ? 'bg-green-500' :
-                      task.status === 'inprogress' ? 'bg-blue-500' :
-                      task.status === 'review' ? 'bg-yellow-500' :
-                      'bg-gray-400'
-                    }`} />
+                  <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className={`w-2 h-2 rounded-full ${getStatusColor(task.status)}`} />
                     <div className="flex-1">
                       <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
                       <p className="text-xs text-gray-500">
                         {new Date(task.updatedAt || task.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className={`px-2 py-1 text-xs rounded-full ${
-                      task.status === 'done' ? 'bg-green-100 text-green-800' :
-                      task.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
-                      task.status === 'review' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {task.status.replace('_', ' ')}
+                    <div className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(task.status)}`}>
+                      {task.status === 'inprogress' ? 'In Progress' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                     </div>
                   </div>
                 ))}
@@ -446,7 +577,8 @@ const Profile = () => {
                 <span className="text-sm text-gray-600">Member Since</span>
                 <span className="text-sm font-medium text-gray-900 flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {user?.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : 'Unknown'}
+                  {user?.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : 
+                   user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
                 </span>
               </div>
               
@@ -472,16 +604,35 @@ const Profile = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
             
             <div className="space-y-2">
-              <button className="w-full btn-outline text-left">
+              <button 
+                onClick={() => navigate('/settings')}
+                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+              >
+                <SettingsIcon className="h-4 w-4 mr-2" />
+                Account Settings
+              </button>
+              <button 
+                onClick={() => navigate('/settings')}
+                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
                 Change Password
               </button>
-              <button className="w-full btn-outline text-left">
+              <button 
+                onClick={() => navigate('/settings')}
+                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
                 Notification Settings
               </button>
-              <button className="w-full btn-outline text-left">
+              <button 
+                onClick={() => navigate('/settings')}
+                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
                 Privacy Settings
               </button>
-              <button className="w-full btn-outline text-left">
+              <button 
+                onClick={handleExportData}
+                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
                 Download My Data
               </button>
             </div>

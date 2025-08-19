@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, Search, Bell, Plus } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import NotificationDropdown from '@components/common/NotificationDropdown';
-// import CreateTaskModal from '@components/tasks/CreateTaskModal';
+import CreateTaskModal from '@components/tasks/CreateTaskModal';
 
 const Header = ({ setSidebarOpen }) => {
   const { user } = useAuth();
@@ -86,12 +86,12 @@ const Header = ({ setSidebarOpen }) => {
       </div>
 
       {/* Create Task Modal */}
-      {/* {showCreateTask && (
+      {showCreateTask && (
         <CreateTaskModal 
           isOpen={showCreateTask}
           onClose={() => setShowCreateTask(false)}
         />
-      )} */}
+      )}
     </>
   );
 };
