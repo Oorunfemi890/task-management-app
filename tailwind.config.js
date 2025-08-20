@@ -4,18 +4,22 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // 🚨 THIS IS THE MISSING PIECE!
   theme: {
     extend: {
       colors: {
         border: "#e5e7eb", // same as Tailwind's default gray-200
         primary: {
           50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd', 
           300: '#60a5fa',
-          400: '#60a5fa', // ✅ Added for dark:border-primary-400
+          400: '#60a5fa',
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
           800: '#1e40af',
+          900: '#1e3a8a',
         },
         success: {
           500: '#10b981',

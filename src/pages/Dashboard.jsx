@@ -1,3 +1,4 @@
+// Dashboard.jsx - Updated with dark mode classes
 import React, { useEffect } from "react";
 import { useTask } from "@context/TaskContext";
 import { useAuth } from "@context/AuthContext";
@@ -55,19 +56,19 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Welcome back, {user?.name || "User"}!
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               Here's what's happening with your projects today.
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Today</p>
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Today</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -116,24 +117,24 @@ const Dashboard = () => {
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Task Distribution Chart */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Task Distribution
             </h2>
             <TaskDistributionChart tasks={tasks} />
           </div>
 
           {/* Recent Tasks */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Recent Tasks
             </h2>
             <RecentTasks tasks={tasks.slice(0, 5)} />
           </div>
 
           {/* Project Progress */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Project Progress
             </h2>
             <ProjectProgress projects={projects} tasks={tasks} />
@@ -143,53 +144,53 @@ const Dashboard = () => {
         {/* Right Column */}
         <div className="space-y-6">
           {/* My Performance */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               My Performance
             </h2>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-medium">
+                  <span className="text-gray-600 dark:text-gray-300">Completion Rate</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {completionRate.toFixed(1)}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
                   <div
-                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-primary-600 dark:bg-primary-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${completionRate}%` }}
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary-600">
+                  <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                     {myTasks.length}
                   </p>
-                  <p className="text-sm text-gray-600">My Tasks</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">My Tasks</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {myCompletedTasks}
                   </p>
-                  <p className="text-sm text-gray-600">Completed</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Completed</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Upcoming Deadlines */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Upcoming Deadlines
             </h2>
             <UpcomingDeadlines tasks={tasks} />
           </div>
 
           {/* Team Activity */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Team Activity
             </h2>
             <TeamActivity teamMembers={teamMembers} tasks={tasks} />
