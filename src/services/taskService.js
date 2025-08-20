@@ -7,13 +7,12 @@ class TaskService {
 
     // Helper method to get auth headers
     getAuthHeaders() {
-        const token = localStorage.getItem('token');
-        return {
-            'Content-Type': 'application/json',
-            ...(token && { Authorization: `Bearer ${token}` })
-        };
-    }
-
+    const token = localStorage.getItem('taskflow_token'); // <-- FIXED
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+    };
+}
     // Helper method to handle API calls
     async apiCall(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
@@ -196,7 +195,7 @@ class TaskService {
         const formData = new FormData();
         formData.append('file', file);
 
-        const token = localStorage.getItem('token');
+const token = localStorage.getItem('taskflow_token'); 
         const headers = {};
         if (token) {
             headers.Authorization = `Bearer ${token}`;

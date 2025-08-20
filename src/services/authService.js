@@ -1,25 +1,66 @@
-import axios from 'axios';
-
+// src/services/authService.js
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
-const API_URL = `${API_BASE}/users/`;
 
 class AuthService {
     constructor() {
         this.baseURL = API_BASE;
+        this.tokenKey = 'taskflow_token';
+        this.userKey = 'taskflow_user';
     }
 
+    // Helper method to get auth headers
+    getAuthHeaders() {
+        const token = this.getToken();
+        return {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` })
+        };
+    }
+
+    // Helper method for API calls with automatic token handling
     async apiCall(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
         const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers: this.getAuthHeaders(),
             ...options
         };
 
         try {
             const response = await fetch(url, config);
+
+            // Handle token expiration
+            if (response.status === 401) {
+                const errorData = await response.json().catch(() => ({}));
+                
+                if (errorData.code === 'TOKEN_EXPIRED') {
+                    // Try to refresh token first
+                    try {
+                        await this.refreshToken();
+                        // Retry the original request with new token
+                        const retryConfig = {
+                            ...config,
+                            headers: this.getAuthHeaders()
+                        };
+                        const retryResponse = await fetch(url, retryConfig);
+                        
+                        if (!retryResponse.ok) {
+                            const retryErrorData = await retryResponse.json().catch(() => ({}));
+                            throw new Error(retryErrorData.message || `HTTP error! status: ${retryResponse.status}`);
+                        }
+                        
+                        return await retryResponse.json();
+                    } catch (refreshError) {
+                        // Refresh failed, logout user
+                        this.logout();
+                        window.location.href = '/login';
+                        throw new Error('Session expired. Please log in again.');
+                    }
+                } else {
+                    // Other auth errors
+                    this.logout();
+                    throw new Error(errorData.message || 'Authentication failed');
+                }
+            }
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -33,25 +74,46 @@ class AuthService {
         }
     }
 
+    // Login with JWT
     async login(credentials) {
         try {
             console.log('Logging in user with credentials:', { email: credentials.email });
-            const response = await axios.post(API_URL + "login", credentials);
             
-            // Since your backend doesn't return a token yet, let's simulate one
-            const token = 'dummy-token-' + Date.now();
-            const result = {
-                token: token,
-                user: response.data.user
-            };
+            const response = await fetch(`${this.baseURL}/users/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: credentials.email.trim().toLowerCase(),
+                    password: credentials.password
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            const result = await response.json();
             
-            return result;
+            if (result.token && result.user) {
+                // Store token and user data
+                this.setToken(result.token);
+                this.setUser(result.user);
+                
+                console.log('Login successful for user:', result.user.id);
+                return result;
+            } else {
+                throw new Error('Invalid response format from server');
+            }
         } catch (error) {
-            console.error('Login error:', error.response?.data || error.message);
+            console.error('Login error:', error);
             throw error;
         }
     }
 
+    // Register with JWT
     async register(userData) {
         try {
             console.log('Registering user with data:', { 
@@ -61,192 +123,184 @@ class AuthService {
                 role: userData.role 
             });
             
-            const response = await axios.post(API_URL + "register", userData);
+            const response = await fetch(`${this.baseURL}/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: userData.name.trim(),
+                    email: userData.email.trim().toLowerCase(),
+                    password: userData.password,
+                    company: userData.company,
+                    role: userData.role || 'member'
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Registration failed');
+            }
+
+            const result = await response.json();
             
-            // Since your backend doesn't return a token yet, let's simulate one
-            const token = 'dummy-token-' + Date.now();
-            const result = {
-                token: token,
-                user: response.data
-            };
-            
-            return result;
+            if (result.token && result.user) {
+                // Store token and user data
+                this.setToken(result.token);
+                this.setUser(result.user);
+                
+                console.log('Registration successful for user:', result.user.id);
+                return result;
+            } else {
+                throw new Error('Invalid response format from server');
+            }
         } catch (error) {
-            console.error('Registration error:', error.response?.data || error.message);
+            console.error('Registration error:', error);
             throw error;
         }
     }
 
+    // Get current user (protected)
     async getCurrentUser() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        // Use the correct endpoint that exists in your backend
-        const response = await this.apiCall('/users/me', {
-            headers: {
-                Authorization: `Bearer ${token}`
+        try {
+            const response = await this.apiCall('/users/me');
+            
+            if (response.user) {
+                // Update stored user data
+                this.setUser(response.user);
+                return response.user;
+            } else {
+                throw new Error('Invalid user data received');
             }
-        });
-
-        return response.user || response;
+        } catch (error) {
+            console.error('Get current user error:', error);
+            throw error;
+        }
     }
 
-    async updateProfile(userData) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
+    // Refresh token
+    async refreshToken() {
+        try {
+            const token = this.getToken();
+            if (!token) {
+                throw new Error('No token to refresh');
+            }
 
-        const response = await this.apiCall('/users/profile', {
+            const response = await fetch(`${this.baseURL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Token refresh failed');
+            }
+
+            const result = await response.json();
+            
+            if (result.token && result.user) {
+                this.setToken(result.token);
+                this.setUser(result.user);
+                return result;
+            } else {
+                throw new Error('Invalid refresh response');
+            }
+        } catch (error) {
+            console.error('Token refresh error:', error);
+            throw error;
+        }
+    }
+
+    // Update profile (protected)
+    async updateProfile(userData) {
+        return await this.apiCall('/users/profile', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify(userData)
         });
-
-        return response;
     }
 
+    // Change password (protected)
     async changePassword(passwordData) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/change-password', {
+        return await this.apiCall('/users/change-password', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify(passwordData)
         });
-
-        return response;
     }
 
+    // Forgot password
     async forgotPassword(email) {
-        const response = await this.apiCall('/users/forgot-password', {
+        const response = await fetch(`${this.baseURL}/users/forgot-password`, {
             method: 'POST',
-            body: JSON.stringify({ email })
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email.trim().toLowerCase() })
         });
 
-        return response;
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Forgot password request failed');
+        }
+
+        return await response.json();
     }
 
+    // Reset password
     async resetPassword(token, newPassword) {
-        const response = await this.apiCall('/users/reset-password', {
+        const response = await fetch(`${this.baseURL}/users/reset-password`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ token, newPassword })
         });
 
-        return response;
-    }
-
-    async refreshToken() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Password reset failed');
         }
 
-        const response = await this.apiCall('/auth/refresh', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        return response;
+        return await response.json();
     }
 
-    // FIXED: Settings API methods - using /users/settings instead of /settings
+    // Settings API methods (protected)
     async getUserSettings() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        return response;
+        return await this.apiCall('/users/settings');
     }
 
     async updateSettings(settings) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings', {
+        return await this.apiCall('/users/settings', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ settings })
         });
-
-        return response;
     }
 
     async updateNotificationSettings(notifications) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings/notifications', {
+        return await this.apiCall('/users/settings/notifications', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ notifications })
         });
-
-        return response;
     }
 
     async updateAppearanceSettings(preferences) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings/appearance', {
+        return await this.apiCall('/users/settings/appearance', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ preferences })
         });
-
-        return response;
     }
 
     async updatePrivacySettings(privacy) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings/privacy', {
+        return await this.apiCall('/users/settings/privacy', {
             method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ privacy })
         });
-
-        return response;
     }
 
     async exportUserData() {
-        const token = localStorage.getItem('token');
+        const token = this.getToken();
         if (!token) {
             throw new Error('No token found');
         }
@@ -277,55 +331,136 @@ class AuthService {
     }
 
     async deleteAccount(password) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings/delete-account', {
+        const result = await this.apiCall('/users/settings/delete-account', {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ confirmPassword: password })
         });
 
         // Clear local storage after account deletion
         this.logout();
-
-        return response;
+        return result;
     }
 
     async deleteAllData(password) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        const response = await this.apiCall('/users/settings/delete-all-data', {
+        const result = await this.apiCall('/users/settings/delete-all-data', {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: JSON.stringify({ confirmPassword: password })
         });
 
         // Clear local storage after data deletion
         this.logout();
-
-        return response;
+        return result;
     }
 
-    logout() {
-        localStorage.removeItem('token');
-    }
-
-    isAuthenticated() {
-        return !!localStorage.getItem('token');
+    // Token management
+    setToken(token) {
+        try {
+            localStorage.setItem(this.tokenKey, token);
+        } catch (error) {
+            console.error('Error storing token:', error);
+        }
     }
 
     getToken() {
-        return localStorage.getItem('token');
+        try {
+            return localStorage.getItem(this.tokenKey);
+        } catch (error) {
+            console.error('Error getting token:', error);
+            return null;
+        }
+    }
+
+    removeToken() {
+        try {
+            localStorage.removeItem(this.tokenKey);
+        } catch (error) {
+            console.error('Error removing token:', error);
+        }
+    }
+
+    // User data management
+    setUser(user) {
+        try {
+            localStorage.setItem(this.userKey, JSON.stringify(user));
+        } catch (error) {
+            console.error('Error storing user data:', error);
+        }
+    }
+
+    getUser() {
+        try {
+            const userData = localStorage.getItem(this.userKey);
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error getting user data:', error);
+            return null;
+        }
+    }
+
+    removeUser() {
+        try {
+            localStorage.removeItem(this.userKey);
+        } catch (error) {
+            console.error('Error removing user data:', error);
+        }
+    }
+
+    // Logout
+    logout() {
+        this.removeToken();
+        this.removeUser();
+    }
+
+    // Check authentication status
+    isAuthenticated() {
+        const token = this.getToken();
+        const user = this.getUser();
+        return !!(token && user);
+    }
+
+    // Check if token is expired (basic check)
+    isTokenExpired() {
+        const token = this.getToken();
+        if (!token) return true;
+
+        try {
+            // Basic JWT token expiration check
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            return payload.exp < currentTime;
+        } catch (error) {
+            console.error('Error checking token expiration:', error);
+            return true;
+        }
+    }
+
+    // Auto-refresh token before expiration
+    startTokenRefreshTimer() {
+        const token = this.getToken();
+        if (!token) return;
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = payload.exp * 1000; // Convert to milliseconds
+            const currentTime = Date.now();
+            const timeUntilExpiration = expirationTime - currentTime;
+            const refreshTime = timeUntilExpiration - (5 * 60 * 1000); // Refresh 5 minutes before expiration
+
+            if (refreshTime > 0) {
+                setTimeout(async () => {
+                    try {
+                        await this.refreshToken();
+                        this.startTokenRefreshTimer(); // Start timer again for new token
+                    } catch (error) {
+                        console.error('Auto token refresh failed:', error);
+                        this.logout();
+                        window.location.href = '/login';
+                    }
+                }, refreshTime);
+            }
+        } catch (error) {
+            console.error('Error setting up token refresh timer:', error);
+        }
     }
 }
 
