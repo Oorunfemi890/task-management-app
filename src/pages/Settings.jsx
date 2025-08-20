@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@context/AuthContext";
-import { useTheme } from "@context/ThemeContext"; // Add theme context
+import { useTheme } from "@context/ThemeContext"; // ADD THIS LINE
 import { authService } from "@services/authService";
 import toast from "react-hot-toast";
 import {
@@ -32,7 +32,7 @@ import {
 
 const Settings = () => {
   const { user } = useAuth();
-  const { theme, setTheme, isLoading: themeLoading } = useTheme(); // Use theme context
+  const { theme, setTheme, isLoading: themeLoading } = useTheme(); // ADD THIS LINE
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -105,9 +105,9 @@ const Settings = () => {
   // Sync theme with preferences when theme context changes
   useEffect(() => {
     if (!themeLoading) {
-      setPreferences((prev) => ({
+      setPreferences(prev => ({
         ...prev,
-        theme: theme,
+        theme: theme
       }));
     }
   }, [theme, themeLoading]);
@@ -175,19 +175,17 @@ const Settings = () => {
     try {
       // Apply theme immediately via context
       await setTheme(newTheme);
-
+      
       // Update local preferences state
-      setPreferences((prev) => ({
+      setPreferences(prev => ({
         ...prev,
-        theme: newTheme,
+        theme: newTheme
       }));
 
-      toast.success(
-        `Theme changed to ${newTheme === "auto" ? "system" : newTheme} mode!`
-      );
+      toast.success(`Theme changed to ${newTheme === 'auto' ? 'system' : newTheme} mode!`);
     } catch (error) {
-      console.error("Error changing theme:", error);
-      toast.error("Failed to change theme");
+      console.error('Error changing theme:', error);
+      toast.error('Failed to change theme');
     }
   };
 
@@ -379,9 +377,7 @@ const Settings = () => {
         <div className="flex items-center space-x-3">
           <SettingsIcon className="h-8 w-8 text-primary-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Settings
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
             <p className="text-gray-600 dark:text-gray-300">
               Manage your account settings and preferences
             </p>
@@ -400,7 +396,7 @@ const Settings = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 text-left rounded-md transition-colors ${
                     activeTab === tab.id
-                      ? "bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border-primary-200"
+                      ? "bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   }`}
                 >
@@ -415,97 +411,6 @@ const Settings = () => {
         {/* Content */}
         <div className="lg:col-span-3">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
-            {activeTab === "appearance" && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Appearance
-                  </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Customize how TaskFlow looks and feels.
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Theme
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button
-                      onClick={() => handleThemeChange("light")}
-                      disabled={themeLoading}
-                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
-                        preferences.theme === "light"
-                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
-                      }`}
-                    >
-                      <Sun className="h-8 w-8" />
-                      <span className="text-sm font-medium">Light</span>
-                      <span className="text-xs text-center">
-                        Clean and bright interface
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => handleThemeChange("dark")}
-                      disabled={themeLoading}
-                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
-                        preferences.theme === "dark"
-                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
-                      }`}
-                    >
-                      <Moon className="h-8 w-8" />
-                      <span className="text-sm font-medium">Dark</span>
-                      <span className="text-xs text-center">
-                        Easy on the eyes
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => handleThemeChange("auto")}
-                      disabled={themeLoading}
-                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
-                        preferences.theme === "auto"
-                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
-                      }`}
-                    >
-                      <Monitor className="h-8 w-8" />
-                      <span className="text-sm font-medium">Auto</span>
-                      <span className="text-xs text-center">
-                        Follows system setting
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* Theme preview info */}
-                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Current theme:{" "}
-                      <span className="font-medium capitalize">
-                        {preferences.theme}
-                      </span>
-                      {preferences.theme === "auto" && (
-                        <span className="ml-1">
-                          (using{" "}
-                          {window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches
-                            ? "dark"
-                            : "light"}{" "}
-                          mode)
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Other tabs content would go here... */}
-            {/* I'm keeping the existing content structure but adding dark mode classes */}
-
             {activeTab === "general" && (
               <div className="space-y-6">
                 <div>
@@ -642,8 +547,8 @@ const Settings = () => {
                         <div>
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                             {key
-                              .replace(/([A-Z])/g, " $1") // add space before capital letters
-                              .toLowerCase() // convert to lowercase
+                              .replace(/([A-Z])/g, " $1")
+                              .toLowerCase()
                               .replace(/^\w/, (c) => c.toUpperCase())}
                           </span>
                           {key === "weeklyDigest" && (
@@ -684,8 +589,8 @@ const Settings = () => {
                       >
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {key
-                            .replace(/([A-Z])/g, " $1") // add space before capital letters
-                            .toLowerCase() // convert to lowercase
+                            .replace(/([A-Z])/g, " $1")
+                            .toLowerCase()
                             .replace(/^\w/, (c) => c.toUpperCase())}
                         </span>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -720,8 +625,8 @@ const Settings = () => {
                       >
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {key
-                            .replace(/([A-Z])/g, " $1") // add space before capital letters
-                            .toLowerCase() // convert to lowercase
+                            .replace(/([A-Z])/g, " $1")
+                            .toLowerCase()
                             .replace(/^\w/, (c) => c.toUpperCase())}
                         </span>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -737,6 +642,86 @@ const Settings = () => {
                         </label>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "appearance" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Appearance
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Customize how TaskFlow looks and feels.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Theme
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button
+                      onClick={() => handleThemeChange("light")}
+                      disabled={themeLoading}
+                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
+                        preferences.theme === "light"
+                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
+                      }`}
+                    >
+                      <Sun className="h-8 w-8" />
+                      <span className="text-sm font-medium">Light</span>
+                      <span className="text-xs text-center">
+                        Clean and bright interface
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleThemeChange("dark")}
+                      disabled={themeLoading}
+                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
+                        preferences.theme === "dark"
+                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
+                      }`}
+                    >
+                      <Moon className="h-8 w-8" />
+                      <span className="text-sm font-medium">Dark</span>
+                      <span className="text-xs text-center">
+                        Easy on the eyes
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleThemeChange("auto")}
+                      disabled={themeLoading}
+                      className={`p-6 border-2 rounded-lg flex flex-col items-center space-y-3 transition-all ${
+                        preferences.theme === "auto"
+                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+                          : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700"
+                      }`}
+                    >
+                      <Monitor className="h-8 w-8" />
+                      <span className="text-sm font-medium">Auto</span>
+                      <span className="text-xs text-center">
+                        Follows system setting
+                      </span>
+                    </button>
+                  </div>
+                  
+                  {/* Theme preview info */}
+                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Current theme: <span className="font-medium capitalize">{preferences.theme}</span>
+                      {preferences.theme === 'auto' && (
+                        <span className="ml-1">
+                          (using {window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'} mode)
+                        </span>
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1035,102 +1020,311 @@ const Settings = () => {
               </div>
             )}
 
-            {/* Additional tabs would continue with similar dark mode classes... */}
-            {/* For brevity, I'll include the save button and modal updates */}
+            {activeTab === "data" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Data & Storage
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Manage your data and storage settings.
+                  </p>
+                </div>
+
+                {/* Data Export */}
+                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg transition-colors">
+                  <h3 className="text-base font-medium text-gray-900 dark:text-white mb-4 flex items-center">
+                    <Download className="h-5 w-5 mr-2" />
+                    Export Data
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    Download a copy of all your data including tasks, projects,
+                    comments, and settings.
+                  </p>
+                  <button
+                    onClick={handleExportData}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Export Complete Data</span>
+                  </button>
+                </div>
+
+                {/* Storage Info */}
+                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg transition-colors">
+                  <h3 className="text-base font-medium text-gray-900 dark:text-white mb-4 flex items-center">
+                    <Database className="h-5 w-5 mr-2" />
+                    Storage Usage
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Used Storage
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        2.4 GB / 10 GB
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                      <div className="bg-primary-600 h-2 rounded-full w-1/4 transition-all duration-300"></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 dark:text-gray-400">
+                      <div>• Tasks: 145 MB</div>
+                      <div>• Projects: 89 MB</div>
+                      <div>• Attachments: 2.1 GB</div>
+                      <div>• Comments: 32 MB</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Danger Zone */}
+                <div className="border-2 border-red-200 dark:border-red-800 rounded-lg p-6 bg-red-50 dark:bg-red-900/20 transition-colors">
+                  <div className="flex items-center mb-4">
+                    <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" />
+                    <h3 className="text-base font-medium text-red-800 dark:text-red-400">
+                      Danger Zone
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-red-800 dark:text-red-400">
+                          Delete All Data
+                        </h4>
+                        <p className="text-sm text-red-700 dark:text-red-300">
+                          Permanently delete all your tasks, projects, and data
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          setDeleteConfirmation({
+                            ...deleteConfirmation,
+                            showDeleteData: true,
+                          })
+                        }
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm bg-red-600 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Data
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-red-800 dark:text-red-400">
+                          Delete Account
+                        </h4>
+                        <p className="text-sm text-red-700 dark:text-red-300">
+                          Permanently delete your account and all associated
+                          data
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          setDeleteConfirmation({
+                            ...deleteConfirmation,
+                            showDeleteAccount: true,
+                          })
+                        }
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm bg-red-600 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Account
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "help" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Help & Support
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Get help and support for using TaskFlow.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-700">
+                    <HelpCircle className="h-8 w-8 text-primary-600 mb-3" />
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                      Help Center
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      Browse our comprehensive help articles and guides
+                    </p>
+                    <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                      Visit Help Center
+                    </button>
+                  </div>
+
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-700">
+                    <Mail className="h-8 w-8 text-green-600 mb-3" />
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                      Contact Support
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      Get in touch with our support team for assistance
+                    </p>
+                    <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                      Contact Support
+                    </button>
+                  </div>
+
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-700">
+                    <Globe className="h-8 w-8 text-blue-600 mb-3" />
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                      Community
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      Join our community forum to connect with other users
+                    </p>
+                    <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                      Join Community
+                    </button>
+                  </div>
+
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow bg-white dark:bg-gray-700">
+                    <Key className="h-8 w-8 text-purple-600 mb-3" />
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                      API Documentation
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      Learn how to integrate with TaskFlow using our API
+                    </p>
+                    <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                      View API Docs
+                    </button>
+                  </div>
+                </div>
+
+                {/* App Info */}
+                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg transition-colors">
+                  <h3 className="text-base font-medium text-gray-900 dark:text-white mb-4 flex items-center">
+                    <Info className="h-5 w-5 mr-2" />
+                    Application Information
+                  </h3>
+                  <div className="grid grid-cols-2 gap-6 text-sm">
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400 block">Version:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">1.0.0</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400 block">Last Updated:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        August 19, 2025
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400 block">License:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">MIT</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 dark:text-gray-400 block">Support:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">24/7</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Save Button for Settings */}
             {(activeTab === "general" ||
               activeTab === "notifications" ||
               activeTab === "appearance" ||
               activeTab === "privacy") && (
-              <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => saveSettings(activeTab)}
-                    disabled={isSaving}
-                    className="px-6 py-2 border border-transparent rounded-md shadow-sm bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                  >
-                    {isSaving ? (
-                      <Loader className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                    )}
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </button>
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => saveSettings(activeTab)}
+                      disabled={isSaving}
+                      className="px-6 py-2 border border-transparent rounded-md shadow-sm bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                      {isSaving ? (
+                        <Loader className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                      )}
+                      {isSaving ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>
 
-      {/* Delete Confirmation Modals with dark mode support */}
+      {/* Delete Confirmation Modals */}
       {(deleteConfirmation.showDeleteAccount ||
         deleteConfirmation.showDeleteData) && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <div className="mt-3 text-center">
-              <AlertTriangle className="mx-auto h-12 w-12 text-red-500" />
-              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-4">
-                {deleteConfirmation.showDeleteAccount
-                  ? "Delete Account"
-                  : "Delete All Data"}
-              </h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+            <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <div className="mt-3 text-center">
+                <AlertTriangle className="mx-auto h-12 w-12 text-red-500" />
+                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-4">
                   {deleteConfirmation.showDeleteAccount
-                    ? "This will permanently delete your account and all associated data. This action cannot be undone."
-                    : "This will permanently delete all your tasks, projects, and data. This action cannot be undone."}
-                </p>
-                <div className="mt-4">
-                  <input
-                    type="password"
-                    placeholder="Enter your password to confirm"
-                    value={deleteConfirmation.confirmPassword}
-                    onChange={(e) =>
+                    ? "Delete Account"
+                    : "Delete All Data"}
+                </h3>
+                <div className="mt-2 px-7 py-3">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    {deleteConfirmation.showDeleteAccount
+                      ? "This will permanently delete your account and all associated data. This action cannot be undone."
+                      : "This will permanently delete all your tasks, projects, and data. This action cannot be undone."}
+                  </p>
+                  <div className="mt-4">
+                    <input
+                      type="password"
+                      placeholder="Enter your password to confirm"
+                      value={deleteConfirmation.confirmPassword}
+                      onChange={(e) =>
+                        setDeleteConfirmation({
+                          ...deleteConfirmation,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-center space-x-3 mt-4">
+                  <button
+                    onClick={() =>
                       setDeleteConfirmation({
-                        ...deleteConfirmation,
-                        confirmPassword: e.target.value,
+                        showDeleteAccount: false,
+                        showDeleteData: false,
+                        confirmPassword: "",
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={
+                      deleteConfirmation.showDeleteAccount
+                        ? handleDeleteAccount
+                        : handleDeleteAllData
+                    }
+                    disabled={!deleteConfirmation.confirmPassword || isSaving}
+                    className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  >
+                    {isSaving ? (
+                      <Loader className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-2" />
+                    )}
+                    {isSaving ? "Deleting..." : "Delete"}
+                  </button>
                 </div>
-              </div>
-              <div className="flex justify-center space-x-3 mt-4">
-                <button
-                  onClick={() =>
-                    setDeleteConfirmation({
-                      showDeleteAccount: false,
-                      showDeleteData: false,
-                      confirmPassword: "",
-                    })
-                  }
-                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={
-                    deleteConfirmation.showDeleteAccount
-                      ? handleDeleteAccount
-                      : handleDeleteAllData
-                  }
-                  disabled={!deleteConfirmation.confirmPassword || isSaving}
-                  className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                >
-                  {isSaving ? (
-                    <Loader className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4 mr-2" />
-                  )}
-                  {isSaving ? "Deleting..." : "Delete"}
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// Sidebar.jsx - Updated with dark mode classes
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -34,10 +35,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
           <div
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800 transition-colors">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -62,14 +63,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   function SidebarContent() {
     return (
-      <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
+      <div className="flex flex-col h-0 flex-1 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors">
         {/* Logo */}
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
-            <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <div className="h-8 w-8 bg-primary-600 dark:bg-primary-700 rounded-lg flex items-center justify-center transition-colors">
               <span className="text-white font-bold text-lg">T</span>
             </div>
-            <h2 className="ml-3 text-xl font-semibold text-gray-900">
+            <h2 className="ml-3 text-xl font-semibold text-gray-900 dark:text-white transition-colors">
               TaskFlow
             </h2>
           </div>
@@ -84,15 +85,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   to={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
                     isActive
-                      ? "bg-primary-100 text-primary-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   <item.icon
-                    className={`mr-3 flex-shrink-0 h-6 w-6 ${
+                    className={`mr-3 flex-shrink-0 h-6 w-6 transition-colors ${
                       isActive
-                        ? "text-primary-500"
-                        : "text-gray-400 group-hover:text-gray-500"
+                        ? "text-primary-500 dark:text-primary-400"
+                        : "text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-300"
                     }`}
                   />
                   {item.name}
@@ -103,20 +104,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </div>
 
         {/* User info */}
-        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+        <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-700 p-4 transition-colors">
           <div className="flex items-center">
-            <div className="h-9 w-9 rounded-full bg-primary-500 flex items-center justify-center">
+            <div className="h-9 w-9 rounded-full bg-primary-500 dark:bg-primary-600 flex items-center justify-center transition-colors">
               <span className="text-white font-medium text-sm">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 {user?.name || "User"}
               </p>
               <button
                 onClick={logout}
-                className="text-xs font-medium text-gray-500 group-hover:text-gray-700"
+                className="text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
               >
                 Logout
               </button>
