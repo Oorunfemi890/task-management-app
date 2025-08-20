@@ -1,54 +1,71 @@
-import React from 'react';
-import { X, Filter, User, Flag, FolderOpen, Calendar } from 'lucide-react';
+import React from "react";
+import { X, Filter, User, Flag, FolderOpen, Calendar } from "lucide-react";
 
-const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll }) => {
+const TaskFilters = ({
+  filters,
+  setFilters,
+  projects,
+  teamMembers,
+  onClearAll,
+}) => {
   const handleFilterChange = (filterType, value) => {
     setFilters({
       ...filters,
-      [filterType]: value
+      [filterType]: value,
     });
   };
 
   const clearFilter = (filterType) => {
     setFilters({
       ...filters,
-      [filterType]: 'all'
+      [filterType]: "all",
     });
   };
 
   const clearAllFilters = () => {
     setFilters({
-      status: 'all',
-      priority: 'all',
-      assignee: 'all',
-      project: 'all'
+      status: "all",
+      priority: "all",
+      assignee: "all",
+      project: "all",
     });
     if (onClearAll) onClearAll();
   };
 
-  const hasActiveFilters = Object.values(filters).some(filter => filter !== 'all');
+  const hasActiveFilters = Object.values(filters).some(
+    (filter) => filter !== "all"
+  );
 
   const getFilterBadgeColor = (filterType, value) => {
-    if (value === 'all') return '';
-    
+    if (value === "all") return "";
+
     switch (filterType) {
-      case 'status':
+      case "status":
         switch (value) {
-          case 'todo': return 'bg-gray-100 text-gray-800';
-          case 'inprogress': return 'bg-blue-100 text-blue-800';
-          case 'review': return 'bg-yellow-100 text-yellow-800';
-          case 'done': return 'bg-green-100 text-green-800';
-          default: return 'bg-gray-100 text-gray-800';
+          case "todo":
+            return "bg-gray-100 text-gray-800";
+          case "inprogress":
+            return "bg-blue-100 text-blue-800";
+          case "review":
+            return "bg-yellow-100 text-yellow-800";
+          case "done":
+            return "bg-green-100 text-green-800";
+          default:
+            return "bg-gray-100 text-gray-800";
         }
-      case 'priority':
+      case "priority":
         switch (value) {
-          case 'high': return 'bg-red-100 text-red-800';
-          case 'medium': return 'bg-yellow-100 text-yellow-800';
-          case 'low': return 'bg-green-100 text-green-800';
-          default: return 'bg-gray-100 text-gray-800';
+          case "high":
+            return "bg-red-100 text-red-800";
+          case "medium":
+            return "bg-yellow-100 text-yellow-800";
+          case "low":
+            return "bg-green-100 text-green-800";
+          default:
+            return "bg-gray-100 text-gray-800";
         }
       default:
-        return 'bg-primary-100 text-primary-800';
+        return "bg-primary-100 text-primary-800";
     }
   };
 
@@ -80,21 +97,24 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {Object.entries(filters).map(([filterType, value]) => {
-            if (value === 'all') return null;
-            
+            if (value === "all") return null;
+
             let displayValue = value;
-            if (filterType === 'assignee' && value !== 'all') {
-              const member = teamMembers.find(m => m.id === parseInt(value));
-              displayValue = member ? member.name : 'Unknown';
-            } else if (filterType === 'project' && value !== 'all') {
-              const project = projects.find(p => p.id === parseInt(value));
-              displayValue = project ? project.name : 'Unknown';
+            if (filterType === "assignee" && value !== "all") {
+              const member = teamMembers.find((m) => m.id === parseInt(value));
+              displayValue = member ? member.name : "Unknown";
+            } else if (filterType === "project" && value !== "all") {
+              const project = projects.find((p) => p.id === parseInt(value));
+              displayValue = project ? project.name : "Unknown";
             }
 
             return (
               <span
                 key={filterType}
-                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getFilterBadgeColor(filterType, value)}`}
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getFilterBadgeColor(
+                  filterType,
+                  value
+                )}`}
               >
                 {filterType}: {displayValue}
                 <button
@@ -121,7 +141,7 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
           </label>
           <select
             value={filters.status}
-            onChange={(e) => handleFilterChange('status', e.target.value)}
+            onChange={(e) => handleFilterChange("status", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           >
             <option value="all">All Status</option>
@@ -142,7 +162,7 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
           </label>
           <select
             value={filters.priority}
-            onChange={(e) => handleFilterChange('priority', e.target.value)}
+            onChange={(e) => handleFilterChange("priority", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           >
             <option value="all">All Priorities</option>
@@ -162,7 +182,7 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
           </label>
           <select
             value={filters.assignee}
-            onChange={(e) => handleFilterChange('assignee', e.target.value)}
+            onChange={(e) => handleFilterChange("assignee", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           >
             <option value="all">All Assignees</option>
@@ -185,7 +205,7 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
           </label>
           <select
             value={filters.project}
-            onChange={(e) => handleFilterChange('project', e.target.value)}
+            onChange={(e) => handleFilterChange("project", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           >
             <option value="all">All Projects</option>
@@ -205,12 +225,22 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
           <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
             <span>Advanced Filters</span>
             <span className="ml-2 group-open:rotate-180 transition-transform">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </span>
           </summary>
-          
+
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Due Date Filter */}
             <div>
@@ -221,8 +251,8 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
                 </div>
               </label>
               <select
-                value={filters.dueDate || 'all'}
-                onChange={(e) => handleFilterChange('dueDate', e.target.value)}
+                value={filters.dueDate || "all"}
+                onChange={(e) => handleFilterChange("dueDate", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               >
                 <option value="all">All Due Dates</option>
@@ -240,8 +270,10 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
                 <span>Created</span>
               </label>
               <select
-                value={filters.createdDate || 'all'}
-                onChange={(e) => handleFilterChange('createdDate', e.target.value)}
+                value={filters.createdDate || "all"}
+                onChange={(e) =>
+                  handleFilterChange("createdDate", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               >
                 <option value="all">All Time</option>
@@ -259,35 +291,37 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
       {/* Quick Filter Buttons */}
       <div className="pt-4 border-t border-gray-200">
         <div className="flex items-center space-x-2 mb-2">
-          <span className="text-sm font-medium text-gray-700">Quick Filters:</span>
+          <span className="text-sm font-medium text-gray-700">
+            Quick Filters:
+          </span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setFilters({ ...filters, status: 'todo' })}
+            onClick={() => setFilters({ ...filters, status: "todo" })}
             className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
           >
             My To Do
           </button>
           <button
-            onClick={() => setFilters({ ...filters, status: 'inprogress' })}
+            onClick={() => setFilters({ ...filters, status: "inprogress" })}
             className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
           >
             In Progress
           </button>
           <button
-            onClick={() => setFilters({ ...filters, priority: 'high' })}
+            onClick={() => setFilters({ ...filters, priority: "high" })}
             className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors"
           >
             High Priority
           </button>
           <button
-            onClick={() => setFilters({ ...filters, dueDate: 'overdue' })}
+            onClick={() => setFilters({ ...filters, dueDate: "overdue" })}
             className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors"
           >
             Overdue
           </button>
           <button
-            onClick={() => setFilters({ ...filters, assignee: 'unassigned' })}
+            onClick={() => setFilters({ ...filters, assignee: "unassigned" })}
             className="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors"
           >
             Unassigned
@@ -299,8 +333,10 @@ const TaskFilters = ({ filters, setFilters, projects, teamMembers, onClearAll })
       {hasActiveFilters && (
         <div className="pt-4 border-t border-gray-200">
           <div className="text-sm text-gray-600">
-            <span className="font-medium">Active filters:</span>{' '}
-            Showing tasks that match {Object.values(filters).filter(f => f !== 'all').length} filter criteria
+            <span className="font-medium">Active filters:</span> Showing tasks
+            that match{" "}
+            {Object.values(filters).filter((f) => f !== "all").length} filter
+            criteria
           </div>
         </div>
       )}

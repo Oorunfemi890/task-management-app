@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@context/AuthContext';
-import { useTask } from '@context/TaskContext';
-import { authService } from '@services/authService';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@context/AuthContext";
+import { useTask } from "@context/TaskContext";
+import { authService } from "@services/authService";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
   MapPin,
   Building,
   Edit,
@@ -22,8 +22,8 @@ import {
   Award,
   Activity,
   Loader,
-  Settings as SettingsIcon
-} from 'lucide-react';
+  Settings as SettingsIcon,
+} from "lucide-react";
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -31,14 +31,14 @@ const Profile = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    location: '',
-    bio: '',
-    title: '',
-    timezone: 'UTC'
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    location: "",
+    bio: "",
+    title: "",
+    timezone: "UTC",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -48,52 +48,61 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        company: user.company || '',
-        location: user.location || '',
-        bio: user.bio || '',
-        title: user.title || '',
-        timezone: user.timezone || 'UTC'
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        company: user.company || "",
+        location: user.location || "",
+        bio: user.bio || "",
+        title: user.title || "",
+        timezone: user.timezone || "UTC",
       });
     }
   }, [user]);
 
-  const userTasks = tasks.filter(task => task.assignee === user?.id);
-  const completedTasks = userTasks.filter(task => task.status === 'done');
-  const overdueTasks = userTasks.filter(task => 
-    task.status !== 'done' && 
-    task.dueDate && 
-    new Date(task.dueDate) < new Date()
+  const userTasks = tasks.filter((task) => task.assignee === user?.id);
+  const completedTasks = userTasks.filter((task) => task.status === "done");
+  const overdueTasks = userTasks.filter(
+    (task) =>
+      task.status !== "done" &&
+      task.dueDate &&
+      new Date(task.dueDate) < new Date()
   );
-  const activeProjects = [...new Set(userTasks.map(task => task.projectId).filter(Boolean))];
+  const activeProjects = [
+    ...new Set(userTasks.map((task) => task.projectId).filter(Boolean)),
+  ];
 
   const stats = {
     totalTasks: userTasks.length,
     completedTasks: completedTasks.length,
     overdueTasks: overdueTasks.length,
     activeProjects: activeProjects.length,
-    completionRate: userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0
+    completionRate:
+      userTasks.length > 0
+        ? Math.round((completedTasks.length / userTasks.length) * 100)
+        : 0,
   };
 
   const validateForm = () => {
     const errors = {};
 
     if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+      errors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
-      errors.name = 'Name must be at least 2 characters';
+      errors.name = "Name must be at least 2 characters";
     }
 
     if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = "Please enter a valid email address";
     }
 
-    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      errors.phone = 'Please enter a valid phone number';
+    if (
+      formData.phone &&
+      !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ""))
+    ) {
+      errors.phone = "Please enter a valid phone number";
     }
 
     setValidationErrors(errors);
@@ -102,23 +111,23 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
   const handleSave = async () => {
     if (!validateForm()) {
-      toast.error('Please fix the validation errors');
+      toast.error("Please fix the validation errors");
       return;
     }
 
@@ -126,15 +135,15 @@ const Profile = () => {
     try {
       // Call the API to update profile
       const response = await authService.updateProfile(formData);
-      
+
       // Update the user in context
       updateUser(response.user || response);
-      
+
       setIsEditing(false);
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error(error.message || 'Failed to update profile');
+      console.error("Error updating profile:", error);
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -144,14 +153,14 @@ const Profile = () => {
     // Reset form data to original user data
     if (user) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        company: user.company || '',
-        location: user.location || '',
-        bio: user.bio || '',
-        title: user.title || '',
-        timezone: user.timezone || 'UTC'
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        company: user.company || "",
+        location: user.location || "",
+        bio: user.bio || "",
+        title: user.title || "",
+        timezone: user.timezone || "UTC",
       });
     }
     setValidationErrors({});
@@ -161,40 +170,44 @@ const Profile = () => {
   const handleExportData = async () => {
     try {
       await authService.exportUserData();
-      toast.success('Data exported successfully!');
+      toast.success("Data exported successfully!");
     } catch (error) {
-      console.error('Error exporting data:', error);
-      toast.error('Failed to export data');
+      console.error("Error exporting data:", error);
+      toast.error("Failed to export data");
     }
   };
 
   const recentTasks = userTasks
-    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt || b.createdAt) -
+        new Date(a.updatedAt || a.createdAt)
+    )
     .slice(0, 5);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'done':
-        return 'bg-green-500';
-      case 'inprogress':
-        return 'bg-blue-500';
-      case 'review':
-        return 'bg-yellow-500';
+      case "done":
+        return "bg-green-500";
+      case "inprogress":
+        return "bg-blue-500";
+      case "review":
+        return "bg-yellow-500";
       default:
-        return 'bg-gray-400';
+        return "bg-gray-400";
     }
   };
 
   const getStatusBadgeColor = (status) => {
     switch (status) {
-      case 'done':
-        return 'bg-green-100 text-green-800';
-      case 'inprogress':
-        return 'bg-blue-100 text-blue-800';
-      case 'review':
-        return 'bg-yellow-100 text-yellow-800';
+      case "done":
+        return "bg-green-100 text-green-800";
+      case "inprogress":
+        return "bg-blue-100 text-blue-800";
+      case "review":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -212,7 +225,7 @@ const Profile = () => {
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {/* Cover Photo */}
         <div className="h-32 bg-gradient-to-r from-primary-500 to-primary-600"></div>
-        
+
         {/* Profile Info */}
         <div className="px-6 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -222,7 +235,7 @@ const Profile = () => {
                 <div className="h-24 w-24 rounded-full bg-white p-1 shadow-lg">
                   <div className="h-full w-full rounded-full bg-primary-500 flex items-center justify-center">
                     <span className="text-white text-2xl font-bold">
-                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
                     </span>
                   </div>
                 </div>
@@ -234,12 +247,14 @@ const Profile = () => {
               {/* Basic Info */}
               <div className="mt-4 sm:mt-0">
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {user?.name || 'User Name'}
+                  {user?.name || "User Name"}
                 </h1>
-                <p className="text-gray-600">{user?.title || user?.role || 'Team Member'}</p>
+                <p className="text-gray-600">
+                  {user?.title || user?.role || "Team Member"}
+                </p>
                 <p className="text-sm text-gray-500 flex items-center mt-1">
                   <Building className="h-4 w-4 mr-1" />
-                  {user?.company || 'No company'}
+                  {user?.company || "No company"}
                 </p>
               </div>
             </div>
@@ -274,7 +289,7 @@ const Profile = () => {
                     ) : (
                       <Save className="h-4 w-4" />
                     )}
-                    <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                    <span>{isSaving ? "Saving..." : "Save"}</span>
                   </button>
                 </div>
               )}
@@ -288,8 +303,10 @@ const Profile = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Personal Information */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Personal Information
+            </h2>
+
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -305,17 +322,23 @@ const Profile = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                          validationErrors.name ? 'border-red-300' : 'border-gray-300'
+                          validationErrors.name
+                            ? "border-red-300"
+                            : "border-gray-300"
                         }`}
                         placeholder="Enter your full name"
                         required
                       />
                       {validationErrors.name && (
-                        <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {validationErrors.name}
+                        </p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">{user?.name || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.name || "Not provided"}
+                    </p>
                   )}
                 </div>
 
@@ -332,17 +355,23 @@ const Profile = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                          validationErrors.email ? 'border-red-300' : 'border-gray-300'
+                          validationErrors.email
+                            ? "border-red-300"
+                            : "border-gray-300"
                         }`}
                         placeholder="Enter your email"
                         required
                       />
                       {validationErrors.email && (
-                        <p className="mt-1 text-sm text-red-600">{validationErrors.email}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {validationErrors.email}
+                        </p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">{user?.email || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.email || "Not provided"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -361,16 +390,22 @@ const Profile = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                          validationErrors.phone ? 'border-red-300' : 'border-gray-300'
+                          validationErrors.phone
+                            ? "border-red-300"
+                            : "border-gray-300"
                         }`}
                         placeholder="Enter phone number"
                       />
                       {validationErrors.phone && (
-                        <p className="mt-1 text-sm text-red-600">{validationErrors.phone}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {validationErrors.phone}
+                        </p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">{user?.phone || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.phone || "Not provided"}
+                    </p>
                   )}
                 </div>
 
@@ -389,7 +424,9 @@ const Profile = () => {
                       placeholder="City, Country"
                     />
                   ) : (
-                    <p className="text-gray-900">{user?.location || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.location || "Not provided"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -409,7 +446,9 @@ const Profile = () => {
                       placeholder="Your job title"
                     />
                   ) : (
-                    <p className="text-gray-900">{user?.title || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.title || "Not provided"}
+                    </p>
                   )}
                 </div>
 
@@ -428,7 +467,9 @@ const Profile = () => {
                       placeholder="Company name"
                     />
                   ) : (
-                    <p className="text-gray-900">{user?.company || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {user?.company || "Not provided"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -447,7 +488,9 @@ const Profile = () => {
                     placeholder="Tell us about yourself..."
                   />
                 ) : (
-                  <p className="text-gray-900">{user?.bio || 'No bio provided'}</p>
+                  <p className="text-gray-900">
+                    {user?.bio || "No bio provided"}
+                  </p>
                 )}
               </div>
 
@@ -466,7 +509,9 @@ const Profile = () => {
                     <option value="America/New_York">Eastern Time (ET)</option>
                     <option value="America/Chicago">Central Time (CT)</option>
                     <option value="America/Denver">Mountain Time (MT)</option>
-                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                    <option value="America/Los_Angeles">
+                      Pacific Time (PT)
+                    </option>
                     <option value="Europe/London">London (GMT)</option>
                     <option value="Europe/Paris">Paris (CET)</option>
                     <option value="Asia/Tokyo">Tokyo (JST)</option>
@@ -474,7 +519,7 @@ const Profile = () => {
                     <option value="Australia/Sydney">Sydney (AEDT)</option>
                   </select>
                 ) : (
-                  <p className="text-gray-900">{user?.timezone || 'UTC'}</p>
+                  <p className="text-gray-900">{user?.timezone || "UTC"}</p>
                 )}
               </div>
             </div>
@@ -486,7 +531,7 @@ const Profile = () => {
               <Activity className="h-5 w-5 mr-2" />
               Recent Tasks
             </h2>
-            
+
             {recentTasks.length === 0 ? (
               <div className="text-center py-8">
                 <Target className="h-12 w-12 text-gray-300 mx-auto mb-3" />
@@ -495,16 +540,34 @@ const Profile = () => {
             ) : (
               <div className="space-y-3">
                 {recentTasks.map((task) => (
-                  <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className={`w-2 h-2 rounded-full ${getStatusColor(task.status)}`} />
+                  <div
+                    key={task.id}
+                    className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${getStatusColor(
+                        task.status
+                      )}`}
+                    />
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {task.title}
+                      </h4>
                       <p className="text-xs text-gray-500">
-                        {new Date(task.updatedAt || task.createdAt).toLocaleDateString()}
+                        {new Date(
+                          task.updatedAt || task.createdAt
+                        ).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(task.status)}`}>
-                      {task.status === 'inprogress' ? 'In Progress' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                    <div
+                      className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(
+                        task.status
+                      )}`}
+                    >
+                      {task.status === "inprogress"
+                        ? "In Progress"
+                        : task.status.charAt(0).toUpperCase() +
+                          task.status.slice(1)}
                     </div>
                   </div>
                 ))}
@@ -521,7 +584,7 @@ const Profile = () => {
               <TrendingUp className="h-5 w-5 mr-2" />
               Performance
             </h2>
-            
+
             <div className="space-y-4">
               {/* Completion Rate */}
               <div>
@@ -530,7 +593,7 @@ const Profile = () => {
                   <span className="font-medium">{stats.completionRate}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
+                  <div
                     className="bg-primary-600 h-3 rounded-full transition-all duration-300"
                     style={{ width: `${stats.completionRate}%` }}
                   />
@@ -540,19 +603,27 @@ const Profile = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{stats.totalTasks}</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {stats.totalTasks}
+                  </div>
                   <div className="text-xs text-blue-700">Total Tasks</div>
                 </div>
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{stats.completedTasks}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {stats.completedTasks}
+                  </div>
                   <div className="text-xs text-green-700">Completed</div>
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">{stats.activeProjects}</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {stats.activeProjects}
+                  </div>
                   <div className="text-xs text-purple-700">Projects</div>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">{stats.overdueTasks}</div>
+                  <div className="text-2xl font-bold text-red-600">
+                    {stats.overdueTasks}
+                  </div>
                   <div className="text-xs text-red-700">Overdue</div>
                 </div>
               </div>
@@ -561,8 +632,12 @@ const Profile = () => {
               {stats.completionRate >= 90 && stats.totalTasks >= 10 && (
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
                   <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                  <div className="text-sm font-medium text-yellow-800">High Performer</div>
-                  <div className="text-xs text-yellow-700">Excellent completion rate!</div>
+                  <div className="text-sm font-medium text-yellow-800">
+                    High Performer
+                  </div>
+                  <div className="text-xs text-yellow-700">
+                    Excellent completion rate!
+                  </div>
                 </div>
               )}
             </div>
@@ -570,25 +645,30 @@ const Profile = () => {
 
           {/* Account Info */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Account Information
+            </h2>
+
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-gray-600">Member Since</span>
                 <span className="text-sm font-medium text-gray-900 flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {user?.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : 
-                   user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                  {user?.joinedAt
+                    ? new Date(user.joinedAt).toLocaleDateString()
+                    : user?.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : "Unknown"}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-gray-600">Role</span>
                 <span className="text-sm font-medium text-gray-900 capitalize">
-                  {user?.role || 'Member'}
+                  {user?.role || "Member"}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-gray-600">Status</span>
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -601,35 +681,37 @@ const Profile = () => {
 
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Quick Actions
+            </h2>
+
             <div className="space-y-2">
-              <button 
-                onClick={() => navigate('/settings')}
+              <button
+                onClick={() => navigate("/settings")}
                 className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
               >
                 <SettingsIcon className="h-4 w-4 mr-2" />
                 Account Settings
               </button>
-              <button 
-                onClick={() => navigate('/settings')}
+              <button
+                onClick={() => navigate("/settings")}
                 className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Change Password
               </button>
-              <button 
-                onClick={() => navigate('/settings')}
+              <button
+                onClick={() => navigate("/settings")}
                 className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Notification Settings
               </button>
-              <button 
-                onClick={() => navigate('/settings')}
+              <button
+                onClick={() => navigate("/settings")}
                 className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Privacy Settings
               </button>
-              <button 
+              <button
                 onClick={handleExportData}
                 className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
