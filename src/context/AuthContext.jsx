@@ -83,11 +83,14 @@ const getErrorMessage = (error) => {
   if (error.message) {
     return error.message;
   }
-  
+
   // If it's an axios error with response data
   if (error.response?.data) {
-    if (error.response.data.details && Array.isArray(error.response.data.details)) {
-      return error.response.data.details.join(', ');
+    if (
+      error.response.data.details &&
+      Array.isArray(error.response.data.details)
+    ) {
+      return error.response.data.details.join(", ");
     }
     if (error.response.data.error) {
       return error.response.data.error;
@@ -96,9 +99,9 @@ const getErrorMessage = (error) => {
       return error.response.data.message;
     }
   }
-  
+
   // Default fallback
-  return 'An unexpected error occurred';
+  return "An unexpected error occurred";
 };
 
 export const AuthProvider = ({ children }) => {
@@ -108,19 +111,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       dispatch({ type: "INITIALIZE_START" });
-      
+
       try {
         // Check if we have stored auth data
         const token = authService.getToken();
         const user = authService.getUser();
-        
+
         if (!token || !user) {
-          throw new Error('No stored authentication data');
+          throw new Error("No stored authentication data");
         }
 
         // Check if token is expired
         if (authService.isTokenExpired()) {
-          console.log('Token expired, attempting refresh...');
+          console.log("Token expired, attempting refresh...");
           try {
             const refreshResult = await authService.refreshToken();
             dispatch({
@@ -130,14 +133,14 @@ export const AuthProvider = ({ children }) => {
                 token: refreshResult.token,
               },
             });
-            
+
             // Start auto-refresh timer
             authService.startTokenRefreshTimer();
             return;
           } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
+            console.error("Token refresh failed:", refreshError);
             authService.logout();
-            throw new Error('Session expired');
+            throw new Error("Session expired");
           }
         }
 
@@ -148,12 +151,12 @@ export const AuthProvider = ({ children }) => {
             type: "INITIALIZE_SUCCESS",
             payload: { user: currentUser, token },
           });
-          
+
           // Start auto-refresh timer
           authService.startTokenRefreshTimer();
         } catch (validateError) {
-          console.error('Token validation failed:', validateError);
-          
+          console.error("Token validation failed:", validateError);
+
           // If validation fails, try refresh once
           try {
             const refreshResult = await authService.refreshToken();
@@ -164,17 +167,17 @@ export const AuthProvider = ({ children }) => {
                 token: refreshResult.token,
               },
             });
-            
+
             // Start auto-refresh timer
             authService.startTokenRefreshTimer();
           } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
+            console.error("Token refresh failed:", refreshError);
             authService.logout();
-            throw new Error('Authentication failed');
+            throw new Error("Authentication failed");
           }
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Auth initialization error:", error);
         dispatch({ type: "INITIALIZE_FAILURE" });
       }
     };
@@ -192,7 +195,7 @@ export const AuthProvider = ({ children }) => {
       });
       return result;
     } catch (error) {
-      console.error('Token refresh error:', error);
+      console.error("Token refresh error:", error);
       logout();
       throw error;
     }
@@ -203,21 +206,21 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const data = await authService.login(credentials);
-      
+
       dispatch({
         type: "LOGIN_SUCCESS",
         payload: data,
       });
-      
+
       // Start auto-refresh timer
       authService.startTokenRefreshTimer();
-      
+
       toast.success("Login successful!");
       return data;
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
       const errorMessage = getErrorMessage(error);
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       toast.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -228,21 +231,21 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const data = await authService.register(userData);
-      
+
       dispatch({
         type: "LOGIN_SUCCESS",
         payload: data,
       });
-      
+
       // Start auto-refresh timer
       authService.startTokenRefreshTimer();
-      
+
       toast.success("Registration successful!");
       return data;
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
       const errorMessage = getErrorMessage(error);
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       toast.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -259,7 +262,7 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (userData) => {
     // Update local state
     dispatch({ type: "UPDATE_USER", payload: userData });
-    
+
     // Update stored user data
     const updatedUser = { ...state.user, ...userData };
     authService.setUser(updatedUser);
@@ -332,12 +335,12 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is admin
   const isAdmin = () => {
-    return state.user?.role === 'admin';
+    return state.user?.role === "admin";
   };
 
   // Check if user is manager or admin
   const canManage = () => {
-    return ['admin', 'manager'].includes(state.user?.role);
+    return ["admin", "manager"].includes(state.user?.role);
   };
 
   const value = {

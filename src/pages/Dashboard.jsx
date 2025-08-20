@@ -1,30 +1,30 @@
-import React, { useEffect } from 'react';
-import { useTask } from '@context/TaskContext';
-import { useAuth } from '@context/AuthContext';
-import { 
-  CheckCircle, 
-  Clock, 
-  AlertTriangle, 
+import React, { useEffect } from "react";
+import { useTask } from "@context/TaskContext";
+import { useAuth } from "@context/AuthContext";
+import {
+  CheckCircle,
+  Clock,
+  AlertTriangle,
   Users,
   TrendingUp,
-  Calendar
-} from 'lucide-react';
-import StatsCard from '@components/dashboard/StatsCard';
-import RecentTasks from '@components/dashboard/RecentTasks';
-import ProjectProgress from '@components/dashboard/ProjectProgress';
-import TeamActivity from '@components/dashboard/TeamActivity';
-import UpcomingDeadlines from '@components/dashboard/UpcomingDeadlines';
-import TaskDistributionChart from '@components/dashboard/TaskDistributionChart';
+  Calendar,
+} from "lucide-react";
+import StatsCard from "@components/dashboard/StatsCard";
+import RecentTasks from "@components/dashboard/RecentTasks";
+import ProjectProgress from "@components/dashboard/ProjectProgress";
+import TeamActivity from "@components/dashboard/TeamActivity";
+import UpcomingDeadlines from "@components/dashboard/UpcomingDeadlines";
+import TaskDistributionChart from "@components/dashboard/TaskDistributionChart";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { 
-    tasks, 
-    projects, 
-    teamMembers, 
-    fetchTasks, 
-    fetchProjects, 
-    fetchTeamMembers 
+  const {
+    tasks,
+    projects,
+    teamMembers,
+    fetchTasks,
+    fetchProjects,
+    fetchTeamMembers,
   } = useTask();
 
   useEffect(() => {
@@ -35,17 +35,22 @@ const Dashboard = () => {
 
   // Calculate stats
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.status === 'done').length;
-  const inProgressTasks = tasks.filter(task => task.status === 'inprogress').length;
-  const overdueTasks = tasks.filter(task => {
+  const completedTasks = tasks.filter((task) => task.status === "done").length;
+  const inProgressTasks = tasks.filter(
+    (task) => task.status === "inprogress"
+  ).length;
+  const overdueTasks = tasks.filter((task) => {
     const dueDate = new Date(task.dueDate);
     const today = new Date();
-    return dueDate < today && task.status !== 'done';
+    return dueDate < today && task.status !== "done";
   }).length;
 
-  const myTasks = tasks.filter(task => task.assignee === user?.id);
-  const myCompletedTasks = myTasks.filter(task => task.status === 'done').length;
-  const completionRate = myTasks.length > 0 ? (myCompletedTasks / myTasks.length) * 100 : 0;
+  const myTasks = tasks.filter((task) => task.assignee === user?.id);
+  const myCompletedTasks = myTasks.filter(
+    (task) => task.status === "done"
+  ).length;
+  const completionRate =
+    myTasks.length > 0 ? (myCompletedTasks / myTasks.length) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -54,7 +59,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Welcome back, {user?.name || 'User'}!
+              Welcome back, {user?.name || "User"}!
             </h1>
             <p className="text-gray-600 mt-1">
               Here's what's happening with your projects today.
@@ -63,11 +68,11 @@ const Dashboard = () => {
           <div className="text-right">
             <p className="text-sm text-gray-500">Today</p>
             <p className="text-lg font-semibold text-gray-900">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </p>
           </div>
@@ -146,10 +151,12 @@ const Dashboard = () => {
               <div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-medium">{completionRate.toFixed(1)}%</span>
+                  <span className="font-medium">
+                    {completionRate.toFixed(1)}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                  <div 
+                  <div
                     className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${completionRate}%` }}
                   />
@@ -157,11 +164,15 @@ const Dashboard = () => {
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary-600">{myTasks.length}</p>
+                  <p className="text-2xl font-bold text-primary-600">
+                    {myTasks.length}
+                  </p>
                   <p className="text-sm text-gray-600">My Tasks</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{myCompletedTasks}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {myCompletedTasks}
+                  </p>
                   <p className="text-sm text-gray-600">Completed</p>
                 </div>
               </div>

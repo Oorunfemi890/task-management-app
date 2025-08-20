@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Menu, Search, Bell, Plus } from 'lucide-react';
-import { useAuth } from '@context/AuthContext';
-import NotificationDropdown from '@components/common/NotificationDropdown';
-import CreateTaskModal from '@components/tasks/CreateTaskModal';
+import React, { useState } from "react";
+import { Menu, Search, Bell, Plus } from "lucide-react";
+import { useAuth } from "@context/AuthContext";
+import NotificationDropdown from "@components/common/NotificationDropdown";
+import CreateTaskModal from "@components/tasks/CreateTaskModal";
 
 const Header = ({ setSidebarOpen }) => {
   const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <>
@@ -69,7 +69,9 @@ const Header = ({ setSidebarOpen }) => {
                 </span>
               </button>
               {showNotifications && (
-                <NotificationDropdown onClose={() => setShowNotifications(false)} />
+                <NotificationDropdown
+                  onClose={() => setShowNotifications(false)}
+                />
               )}
             </div>
 
@@ -77,7 +79,7 @@ const Header = ({ setSidebarOpen }) => {
             <div className="relative">
               <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
                 <span className="text-white font-medium text-sm">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
                 </span>
               </div>
             </div>
@@ -87,7 +89,7 @@ const Header = ({ setSidebarOpen }) => {
 
       {/* Create Task Modal */}
       {showCreateTask && (
-        <CreateTaskModal 
+        <CreateTaskModal
           isOpen={showCreateTask}
           onClose={() => setShowCreateTask(false)}
         />

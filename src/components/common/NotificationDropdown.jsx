@@ -1,68 +1,68 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  CheckCircle, 
-  Clock, 
-  Users, 
-  AlertTriangle, 
+import React, { useState, useEffect, useRef } from "react";
+import {
+  CheckCircle,
+  Clock,
+  Users,
+  AlertTriangle,
   X,
   MoreHorizontal,
-  Check
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+  Check,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 const NotificationDropdown = ({ onClose }) => {
   const dropdownRef = useRef(null);
   const [notifications, setNotifications] = useState([
     {
       id: 1,
-      type: 'task_assigned',
-      title: 'New task assigned',
+      type: "task_assigned",
+      title: "New task assigned",
       message: 'You have been assigned to "Update user interface"',
       time: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
       isRead: false,
       icon: CheckCircle,
-      color: 'blue'
+      color: "blue",
     },
     {
       id: 2,
-      type: 'task_completed',
-      title: 'Task completed',
+      type: "task_completed",
+      title: "Task completed",
       message: 'John completed "Fix login bug"',
       time: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
       isRead: false,
       icon: CheckCircle,
-      color: 'green'
+      color: "green",
     },
     {
       id: 3,
-      type: 'deadline_approaching',
-      title: 'Deadline approaching',
+      type: "deadline_approaching",
+      title: "Deadline approaching",
       message: '"Database migration" is due tomorrow',
       time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
       isRead: true,
       icon: Clock,
-      color: 'yellow'
+      color: "yellow",
     },
     {
       id: 4,
-      type: 'team_mention',
-      title: 'You were mentioned',
-      message: 'Sarah mentioned you in a comment',
+      type: "team_mention",
+      title: "You were mentioned",
+      message: "Sarah mentioned you in a comment",
       time: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
       isRead: true,
       icon: Users,
-      color: 'purple'
+      color: "purple",
     },
     {
       id: 5,
-      type: 'task_overdue',
-      title: 'Task overdue',
+      type: "task_overdue",
+      title: "Task overdue",
       message: '"Review documentation" is overdue',
       time: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       isRead: true,
       icon: AlertTriangle,
-      color: 'red'
-    }
+      color: "red",
+    },
   ]);
 
   useEffect(() => {
@@ -72,16 +72,16 @@ const NotificationDropdown = ({ onClose }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
 
   const markAsRead = (notificationId) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === notificationId 
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId
           ? { ...notification, isRead: true }
           : notification
       )
@@ -89,43 +89,55 @@ const NotificationDropdown = ({ onClose }) => {
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notification => ({ ...notification, isRead: true }))
+    setNotifications((prev) =>
+      prev.map((notification) => ({ ...notification, isRead: true }))
     );
   };
 
   const deleteNotification = (notificationId) => {
-    setNotifications(prev => 
-      prev.filter(notification => notification.id !== notificationId)
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== notificationId)
     );
   };
 
   const getNotificationBgColor = (color) => {
     switch (color) {
-      case 'blue': return 'bg-blue-100';
-      case 'green': return 'bg-green-100';
-      case 'yellow': return 'bg-yellow-100';
-      case 'purple': return 'bg-purple-100';
-      case 'red': return 'bg-red-100';
-      default: return 'bg-gray-100';
+      case "blue":
+        return "bg-blue-100";
+      case "green":
+        return "bg-green-100";
+      case "yellow":
+        return "bg-yellow-100";
+      case "purple":
+        return "bg-purple-100";
+      case "red":
+        return "bg-red-100";
+      default:
+        return "bg-gray-100";
     }
   };
 
   const getNotificationTextColor = (color) => {
     switch (color) {
-      case 'blue': return 'text-blue-600';
-      case 'green': return 'text-green-600';
-      case 'yellow': return 'text-yellow-600';
-      case 'purple': return 'text-purple-600';
-      case 'red': return 'text-red-600';
-      default: return 'text-gray-600';
+      case "blue":
+        return "text-blue-600";
+      case "green":
+        return "text-green-600";
+      case "yellow":
+        return "text-yellow-600";
+      case "purple":
+        return "text-purple-600";
+      case "red":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div 
+    <div
       ref={dropdownRef}
       className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden"
     >
@@ -147,7 +159,7 @@ const NotificationDropdown = ({ onClose }) => {
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
@@ -169,18 +181,26 @@ const NotificationDropdown = ({ onClose }) => {
         ) : (
           notifications.map((notification) => {
             const IconComponent = notification.icon;
-            
+
             return (
               <div
                 key={notification.id}
                 className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors relative ${
-                  !notification.isRead ? 'bg-blue-50' : ''
+                  !notification.isRead ? "bg-blue-50" : ""
                 }`}
               >
                 <div className="flex items-start space-x-3">
                   {/* Icon */}
-                  <div className={`p-2 rounded-full ${getNotificationBgColor(notification.color)} flex-shrink-0`}>
-                    <IconComponent className={`h-4 w-4 ${getNotificationTextColor(notification.color)}`} />
+                  <div
+                    className={`p-2 rounded-full ${getNotificationBgColor(
+                      notification.color
+                    )} flex-shrink-0`}
+                  >
+                    <IconComponent
+                      className={`h-4 w-4 ${getNotificationTextColor(
+                        notification.color
+                      )}`}
+                    />
                   </div>
 
                   {/* Content */}
@@ -194,7 +214,9 @@ const NotificationDropdown = ({ onClose }) => {
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {formatDistanceToNow(notification.time, { addSuffix: true })}
+                          {formatDistanceToNow(notification.time, {
+                            addSuffix: true,
+                          })}
                         </p>
                       </div>
 
@@ -209,7 +231,7 @@ const NotificationDropdown = ({ onClose }) => {
                             <Check className="h-4 w-4" />
                           </button>
                         )}
-                        
+
                         <button
                           onClick={() => deleteNotification(notification.id)}
                           className="p-1 text-gray-400 hover:text-red-600 transition-colors"
