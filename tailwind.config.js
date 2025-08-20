@@ -10,9 +10,12 @@ export default {
         border: "#e5e7eb", // same as Tailwind's default gray-200
         primary: {
           50: '#f0f9ff',
+          300: '#60a5fa',
+          400: '#60a5fa', // ✅ Added for dark:border-primary-400
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
+          800: '#1e40af',
         },
         success: {
           500: '#10b981',
