@@ -146,7 +146,7 @@ const Calendar = () => {
         className={`p-2 rounded border-l-4 cursor-pointer hover:shadow-sm transition-shadow ${getPriorityColor(
           task.priority
         ).replace("bg-", "border-")} ${
-          isOverdue(task) ? "bg-red-50" : "bg-white"
+          isOverdue(task) ? "bg-red-50 dark:bg-red-900/20" : "bg-white dark:bg-gray-800"
         }`}
         onClick={() => setSelectedTask(task)}
       >
@@ -155,12 +155,12 @@ const Calendar = () => {
             <p
               className={`font-medium truncate ${
                 isCompact ? "text-xs" : "text-sm"
-              } ${isOverdue(task) ? "text-red-700" : "text-gray-900"}`}
+              } ${isOverdue(task) ? "text-red-700 dark:text-red-300" : "text-gray-900 dark:text-white"}`}
             >
               {task.title}
             </p>
             {!isCompact && (
-              <p className="text-xs text-gray-600 mt-1 truncate">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">
                 {task.description}
               </p>
             )}
@@ -171,7 +171,7 @@ const Calendar = () => {
               className={`w-2 h-2 rounded-full ${getStatusColor(task.status)}`}
             />
             {assignee && (
-              <div className="w-4 h-4 rounded-full bg-primary-500 flex items-center justify-center">
+              <div className="w-4 h-4 rounded-full bg-primary-500 dark:bg-primary-600 flex items-center justify-center">
                 <span className="text-white text-xs">
                   {assignee.name?.charAt(0)?.toUpperCase()}
                 </span>
@@ -186,13 +186,13 @@ const Calendar = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <CalendarIcon className="h-8 w-8 text-primary-600" />
+            <CalendarIcon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-              <p className="text-gray-600">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Calendar</h1>
+              <p className="text-gray-600 dark:text-gray-400">
                 View and manage your tasks by date
               </p>
             </div>
@@ -204,7 +204,7 @@ const Calendar = () => {
               onChange={(e) =>
                 setFilters({ ...filters, priority: e.target.value })
               }
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             >
               <option value="all">All Priorities</option>
               <option value="high">High</option>
@@ -217,7 +217,7 @@ const Calendar = () => {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             >
               <option value="all">All Status</option>
               <option value="todo">To Do</option>
@@ -239,44 +239,44 @@ const Calendar = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Calendar */}
-        <div className="lg:col-span-3 bg-white rounded-lg shadow-sm p-6">
+        <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigateMonth("prev")}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </button>
 
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {format(currentDate, "MMMM yyyy")}
               </h2>
 
               <button
                 onClick={() => navigateMonth("next")}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
 
             <button
               onClick={() => setCurrentDate(new Date())}
-              className="btn-outline text-sm"
+              className="btn-outline text-sm border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Today
             </button>
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden">
+          <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
             {/* Day Headers */}
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <div
                 key={day}
-                className="bg-gray-50 px-3 py-2 text-center text-sm font-medium text-gray-500"
+                className="bg-gray-50 dark:bg-gray-800 px-3 py-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400"
               >
                 {day}
               </div>
@@ -292,14 +292,14 @@ const Calendar = () => {
               return (
                 <div
                   key={index}
-                  className={`bg-white min-h-[120px] p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
+                  className={`bg-white dark:bg-gray-800 min-h-[120px] p-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                     isSelected ? "ring-2 ring-primary-500" : ""
                   } ${!isCurrentMonth ? "opacity-40" : ""}`}
                   onClick={() => setSelectedDate(day)}
                 >
                   <div
                     className={`text-sm font-medium mb-2 ${
-                      isTodayDate ? "text-primary-600" : "text-gray-900"
+                      isTodayDate ? "text-primary-600 dark:text-primary-400" : "text-gray-900 dark:text-white"
                     }`}
                   >
                     {format(day, "d")}
@@ -311,7 +311,7 @@ const Calendar = () => {
                     ))}
 
                     {tasksForDay.length > 3 && (
-                      <div className="text-xs text-gray-500 px-2 py-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1">
                         +{tasksForDay.length - 3} more
                       </div>
                     )}
@@ -325,23 +325,23 @@ const Calendar = () => {
         {/* Sidebar - Selected Date Tasks */}
         <div className="space-y-6">
           {/* Selected Date Info */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {format(selectedDate, "EEEE, MMMM d")}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {getTasksForSelectedDate().length} task
               {getTasksForSelectedDate().length !== 1 ? "s" : ""} scheduled
             </p>
           </div>
 
           {/* Tasks for Selected Date */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Tasks</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Tasks</h3>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="btn-outline text-sm flex items-center space-x-1"
+                className="btn-outline text-sm flex items-center space-x-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <Plus className="h-3 w-3" />
                 <span>Add</span>
@@ -350,11 +350,11 @@ const Calendar = () => {
 
             {getTasksForSelectedDate().length === 0 ? (
               <div className="text-center py-8">
-                <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm">No tasks for this date</p>
+                <CalendarIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-600 dark:text-gray-400 text-sm">No tasks for this date</p>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="text-primary-600 text-sm hover:text-primary-500 mt-2"
+                  className="text-primary-600 dark:text-primary-400 text-sm hover:text-primary-500 dark:hover:text-primary-300 mt-2"
                 >
                   Create a task
                 </button>
@@ -369,50 +369,50 @@ const Calendar = () => {
           </div>
 
           {/* Calendar Legend */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Legend</h3>
 
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Priority
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-red-500 rounded"></div>
-                    <span className="text-sm text-gray-600">High Priority</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">High Priority</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
                       Medium Priority
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-green-500 rounded"></div>
-                    <span className="text-sm text-gray-600">Low Priority</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Low Priority</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Status</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</p>
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                    <span className="text-sm text-gray-600">To Do</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">To Do</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">In Progress</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">In Progress</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Review</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Review</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Done</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Done</span>
                   </div>
                 </div>
               </div>
