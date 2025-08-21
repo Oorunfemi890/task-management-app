@@ -1,3 +1,4 @@
+// Profile.jsx - Updated with dark mode classes
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@context/AuthContext";
 import { useTask } from "@context/TaskContext";
@@ -194,20 +195,20 @@ const Profile = () => {
       case "review":
         return "bg-yellow-500";
       default:
-        return "bg-gray-400";
+        return "bg-gray-400 dark:bg-gray-500";
     }
   };
 
   const getStatusBadgeColor = (status) => {
     switch (status) {
       case "done":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       case "inprogress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
       case "review":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200";
     }
   };
 
@@ -222,9 +223,9 @@ const Profile = () => {
   return (
     <div className="space-y-6">
       {/* Profile Header */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden transition-colors">
         {/* Cover Photo */}
-        <div className="h-32 bg-gradient-to-r from-primary-500 to-primary-600"></div>
+        <div className="h-32 bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700"></div>
 
         {/* Profile Info */}
         <div className="px-6 py-6">
@@ -232,27 +233,27 @@ const Profile = () => {
             <div className="flex items-center space-x-4">
               {/* Profile Picture */}
               <div className="relative -mt-16">
-                <div className="h-24 w-24 rounded-full bg-white p-1 shadow-lg">
-                  <div className="h-full w-full rounded-full bg-primary-500 flex items-center justify-center">
+                <div className="h-24 w-24 rounded-full bg-white dark:bg-gray-800 p-1 shadow-lg">
+                  <div className="h-full w-full rounded-full bg-primary-500 dark:bg-primary-600 flex items-center justify-center">
                     <span className="text-white text-2xl font-bold">
                       {user?.name?.charAt(0)?.toUpperCase() || "U"}
                     </span>
                   </div>
                 </div>
-                <button className="absolute bottom-0 right-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-200 transition-colors">
-                  <Camera className="h-4 w-4 text-gray-600" />
+                <button className="absolute bottom-0 right-0 h-8 w-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <Camera className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                 </button>
               </div>
 
               {/* Basic Info */}
               <div className="mt-4 sm:mt-0">
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {user?.name || "User Name"}
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {user?.title || user?.role || "Team Member"}
                 </p>
-                <p className="text-sm text-gray-500 flex items-center mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
                   <Building className="h-4 w-4 mr-1" />
                   {user?.company || "No company"}
                 </p>
@@ -264,7 +265,7 @@ const Profile = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 flex items-center space-x-2 transition-colors"
                 >
                   <Edit className="h-4 w-4" />
                   <span>Edit Profile</span>
@@ -274,7 +275,7 @@ const Profile = () => {
                   <button
                     onClick={handleCancel}
                     disabled={isSaving}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <X className="h-4 w-4" />
                     <span>Cancel</span>
@@ -282,7 +283,7 @@ const Profile = () => {
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm bg-primary-600 dark:bg-primary-700 text-sm font-medium text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isSaving ? (
                       <Loader className="h-4 w-4 animate-spin" />
@@ -302,15 +303,15 @@ const Profile = () => {
         {/* Left Column - Profile Details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Personal Information */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Personal Information
             </h2>
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <User className="inline h-4 w-4 mr-1" />
                     Full Name *
                   </label>
@@ -321,10 +322,10 @@ const Profile = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                           validationErrors.name
                             ? "border-red-300"
-                            : "border-gray-300"
+                            : "border-gray-300 dark:border-gray-600"
                         }`}
                         placeholder="Enter your full name"
                         required
@@ -336,14 +337,14 @@ const Profile = () => {
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.name || "Not provided"}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <Mail className="inline h-4 w-4 mr-1" />
                     Email *
                   </label>
@@ -354,10 +355,10 @@ const Profile = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                           validationErrors.email
                             ? "border-red-300"
-                            : "border-gray-300"
+                            : "border-gray-300 dark:border-gray-600"
                         }`}
                         placeholder="Enter your email"
                         required
@@ -369,7 +370,7 @@ const Profile = () => {
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.email || "Not provided"}
                     </p>
                   )}
@@ -378,7 +379,7 @@ const Profile = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <Phone className="inline h-4 w-4 mr-1" />
                     Phone
                   </label>
@@ -389,10 +390,10 @@ const Profile = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
                           validationErrors.phone
                             ? "border-red-300"
-                            : "border-gray-300"
+                            : "border-gray-300 dark:border-gray-600"
                         }`}
                         placeholder="Enter phone number"
                       />
@@ -403,14 +404,14 @@ const Profile = () => {
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.phone || "Not provided"}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <MapPin className="inline h-4 w-4 mr-1" />
                     Location
                   </label>
@@ -420,11 +421,11 @@ const Profile = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                       placeholder="City, Country"
                     />
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.location || "Not provided"}
                     </p>
                   )}
@@ -433,7 +434,7 @@ const Profile = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Job Title
                   </label>
                   {isEditing ? (
@@ -442,18 +443,18 @@ const Profile = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                       placeholder="Your job title"
                     />
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.title || "Not provided"}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <Building className="inline h-4 w-4 mr-1" />
                     Company
                   </label>
@@ -463,11 +464,11 @@ const Profile = () => {
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                       placeholder="Company name"
                     />
                   ) : (
-                    <p className="text-gray-900">
+                    <p className="text-gray-900 dark:text-white">
                       {user?.company || "Not provided"}
                     </p>
                   )}
@@ -475,7 +476,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Bio
                 </label>
                 {isEditing ? (
@@ -484,18 +485,18 @@ const Profile = () => {
                     value={formData.bio}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                     placeholder="Tell us about yourself..."
                   />
                 ) : (
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {user?.bio || "No bio provided"}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Timezone
                 </label>
                 {isEditing ? (
@@ -503,7 +504,7 @@ const Profile = () => {
                     name="timezone"
                     value={formData.timezone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                   >
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">Eastern Time (ET)</option>
@@ -519,30 +520,30 @@ const Profile = () => {
                     <option value="Australia/Sydney">Sydney (AEDT)</option>
                   </select>
                 ) : (
-                  <p className="text-gray-900">{user?.timezone || "UTC"}</p>
+                  <p className="text-gray-900 dark:text-white">{user?.timezone || "UTC"}</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <Activity className="h-5 w-5 mr-2" />
               Recent Tasks
             </h2>
 
             {recentTasks.length === 0 ? (
               <div className="text-center py-8">
-                <Target className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600">No recent tasks</p>
+                <Target className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-600 dark:text-gray-300">No recent tasks</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {recentTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
                     <div
                       className={`w-2 h-2 rounded-full ${getStatusColor(
@@ -550,10 +551,10 @@ const Profile = () => {
                       )}`}
                     />
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                         {task.title}
                       </h4>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(
                           task.updatedAt || task.createdAt
                         ).toLocaleDateString()}
@@ -579,8 +580,8 @@ const Profile = () => {
         {/* Right Column - Stats & Info */}
         <div className="space-y-6">
           {/* Performance Stats */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <TrendingUp className="h-5 w-5 mr-2" />
               Performance
             </h2>
@@ -589,12 +590,12 @@ const Profile = () => {
               {/* Completion Rate */}
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-medium">{stats.completionRate}%</span>
+                  <span className="text-gray-600 dark:text-gray-300">Completion Rate</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{stats.completionRate}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                   <div
-                    className="bg-primary-600 h-3 rounded-full transition-all duration-300"
+                    className="bg-primary-600 dark:bg-primary-500 h-3 rounded-full transition-all duration-300"
                     style={{ width: `${stats.completionRate}%` }}
                   />
                 </div>
@@ -602,40 +603,40 @@ const Profile = () => {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
+                <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {stats.totalTasks}
                   </div>
-                  <div className="text-xs text-blue-700">Total Tasks</div>
+                  <div className="text-xs text-blue-700 dark:text-blue-300">Total Tasks</div>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
+                <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {stats.completedTasks}
                   </div>
-                  <div className="text-xs text-green-700">Completed</div>
+                  <div className="text-xs text-green-700 dark:text-green-300">Completed</div>
                 </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
+                <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {stats.activeProjects}
                   </div>
-                  <div className="text-xs text-purple-700">Projects</div>
+                  <div className="text-xs text-purple-700 dark:text-purple-300">Projects</div>
                 </div>
-                <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">
+                <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                     {stats.overdueTasks}
                   </div>
-                  <div className="text-xs text-red-700">Overdue</div>
+                  <div className="text-xs text-red-700 dark:text-red-300">Overdue</div>
                 </div>
               </div>
 
               {/* Achievement Badge */}
               {stats.completionRate >= 90 && stats.totalTasks >= 10 && (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                  <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                  <div className="text-sm font-medium text-yellow-800">
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-center">
+                  <Award className="h-8 w-8 text-yellow-500 dark:text-yellow-400 mx-auto mb-2" />
+                  <div className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                     High Performer
                   </div>
-                  <div className="text-xs text-yellow-700">
+                  <div className="text-xs text-yellow-700 dark:text-yellow-300">
                     Excellent completion rate!
                   </div>
                 </div>
@@ -644,15 +645,15 @@ const Profile = () => {
           </div>
 
           {/* Account Info */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Account Information
             </h2>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Member Since</span>
-                <span className="text-sm font-medium text-gray-900 flex items-center">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Member Since</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
                   {user?.joinedAt
                     ? new Date(user.joinedAt).toLocaleDateString()
@@ -663,15 +664,15 @@ const Profile = () => {
               </div>
 
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Role</span>
-                <span className="text-sm font-medium text-gray-900 capitalize">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Role</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
                   {user?.role || "Member"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Status</span>
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Status</span>
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
                   Active
                 </span>
@@ -680,40 +681,40 @@ const Profile = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Quick Actions
             </h2>
 
             <div className="space-y-2">
               <button
                 onClick={() => navigate("/settings")}
-                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+                className="w-full text-left px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 flex items-center transition-colors"
               >
                 <SettingsIcon className="h-4 w-4 mr-2" />
                 Account Settings
               </button>
               <button
                 onClick={() => navigate("/settings")}
-                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full text-left px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 transition-colors"
               >
                 Change Password
               </button>
               <button
                 onClick={() => navigate("/settings")}
-                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full text-left px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 transition-colors"
               >
                 Notification Settings
               </button>
               <button
                 onClick={() => navigate("/settings")}
-                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full text-left px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 transition-colors"
               >
                 Privacy Settings
               </button>
               <button
                 onClick={handleExportData}
-                className="w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full text-left px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 transition-colors"
               >
                 Download My Data
               </button>
