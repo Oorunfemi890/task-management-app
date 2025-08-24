@@ -2,8 +2,10 @@
 import React, { useState } from "react";
 import { Menu, Search, Bell, Plus } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
-import NotificationDropdown from "@components/common/NotificationDropdown";
+import EnhancedNotificationDropdown from "@components/common/EnhancedNotificationDropdown";
 import CreateTaskModal from "@components/tasks/CreateTaskModal";
+
+
 
 const Header = ({ setSidebarOpen }) => {
   const { user } = useAuth();
@@ -70,7 +72,7 @@ const Header = ({ setSidebarOpen }) => {
                 </span>
               </button>
               {showNotifications && (
-                <NotificationDropdown
+                <EnhancedNotificationDropdown
                   onClose={() => setShowNotifications(false)}
                 />
               )}
