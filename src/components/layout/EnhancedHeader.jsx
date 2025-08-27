@@ -1,6 +1,6 @@
 // src/components/layout/EnhancedHeader.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- add this import at the top
+import { useNavigate } from 'react-router-dom'; 
 import { Bell, Search, Settings, User, LogOut, Moon, Sun } from 'lucide-react';
 import { useAuth } from '@context/AuthContext';
 import { useNotifications } from '@context/NotificationContext';
