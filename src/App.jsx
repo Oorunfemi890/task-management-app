@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@context/AuthContext";
 import { TaskProvider } from "@context/TaskContext";
-import { ThemeProvider } from "@context/ThemeContext"; // Add ThemeProvider
+import { ThemeProvider } from "@context/ThemeContext";
 import Layout from "@components/layout/Layout";
 import ProtectedRoute from "@components/auth/ProtectedRoute";
 import { NotificationProvider } from "@context/NotificationContext";
@@ -14,11 +14,12 @@ import Login from "@pages/auth/Login";
 import Register from "@pages/auth/Register";
 import ForgotPassword from "@pages/auth/ForgotPassword";
 import ResetPassword from "@pages/auth/ResetPassword";
+import AcceptInvitation from "@pages/AcceptInvitation"; // Add this
 import Dashboard from "@pages/Dashboard";
 import TaskBoard from "@pages/TaskBoard";
 import Projects from "@pages/Projects";
 import ProjectDetails from "@pages/ProjectDetails";
-import Team from "@pages/Team";
+import Team from "@pages/Team";           
 import Profile from "@pages/Profile";
 import Settings from "@pages/Settings";
 import Analytics from "@pages/Analytics";
@@ -70,11 +71,12 @@ function App() {
                     {/* Auth Routes */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route
-                      path="/forgot-password"
-                      element={<ForgotPassword />}
-                    />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
+                    
+                    {/* Invitation Routes (PUBLIC) */}
+                    <Route path="/accept-invitation/:token" element={<AcceptInvitation />} />
+                    <Route path="/invite/:token" element={<AcceptInvitation />} />
 
                     {/* Protected Routes */}
                     <Route
@@ -86,6 +88,7 @@ function App() {
                       }
                     >
                       <Route index element={<Dashboard />} />
+                      <Route path="dashboard" element={<Dashboard />} />
                       <Route path="board" element={<TaskBoard />} />
                       <Route path="projects" element={<Projects />} />
                       <Route path="projects/:id" element={<ProjectDetails />} />

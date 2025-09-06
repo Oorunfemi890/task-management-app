@@ -1,8 +1,7 @@
 // src/pages/AcceptInvitation.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { inviteApi } from "@/api/endpoints/inviteApi";
-import { useAuth } from "@/hooks/api/useAuth";
+import { inviteApi } from "@/api/inviteApi";
 import toast from "react-hot-toast";
 import {
   UserPlus,
@@ -12,12 +11,12 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 const AcceptInvitation = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [invitation, setInvitation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,11 +36,14 @@ const AcceptInvitation = () => {
   const loadInvitationDetails = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const details = await inviteApi.getInvitationDetails(token);
       setInvitation(details);
     } catch (error) {
       console.error("Error loading invitation:", error);
-      setError(error.message || "Invalid or expired invitation");
+      const errorMessage =
+        error.error || error.message || "Invalid or expired invitation";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -52,6 +54,8 @@ const AcceptInvitation = () => {
 
     if (!formData.name.trim()) {
       errors.name = "Name is required";
+    } else if (formData.name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters long";
     }
 
     if (!formData.password) {
@@ -84,19 +88,19 @@ const AcceptInvitation = () => {
 
       toast.success("Account created successfully! Welcome to TaskFlow!");
 
-      // Auto-login the user
-      if (response.token) {
+      // Store auth data
+      if (response.token && response.user) {
         localStorage.setItem("taskflow_token", response.token);
         localStorage.setItem("taskflow_user", JSON.stringify(response.user));
-
-        // Redirect to dashboard
-        navigate("/dashboard");
-      } else {
-        navigate("/login");
       }
+
+      // Redirect to dashboard
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error accepting invitation:", error);
-      toast.error(error.message || "Failed to create account");
+      const errorMessage =
+        error.error || error.message || "Failed to create account";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,13 +134,21 @@ const AcceptInvitation = () => {
             <h1 className="text-xl font-semibold text-gray-900 mb-2">
               Invalid Invitation
             </h1>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              Go to Login
-            </button>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                Go to Login
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Create New Account
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -146,6 +158,18 @@ const AcceptInvitation = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Back Button */}
+        <div className="flex">
+          <button
+            onClick={() => navigate("/login")}
+            className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Login
+          </button>
+        </div>
+
+        {/* Header */}
         <div>
           <div className="text-center">
             <div className="mx-auto h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">

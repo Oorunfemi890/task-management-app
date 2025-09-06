@@ -1,5 +1,5 @@
 // src/api/endpoints/inviteApi.js
-import { apiClient } from '../client/apiClient';
+// import { apiClient } from '../client/apiClient';
 
 export const inviteApi = {
   // Send email invitations
@@ -8,11 +8,36 @@ export const inviteApi = {
   // Generate shareable invite link
   generateInviteLink: (data) => apiClient.post('/invites/generate-link', data),
 
-  // Get invitation details by token
-  getInvitationDetails: (token) => apiClient.get(`/invites/details/${token}`),
+  // Get invitation details by token (PUBLIC)
+  getInvitationDetails: (token) => {
+    // Use fetch directly for public endpoints
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+    return fetch(`${API_BASE}/invites/details/${token}`)
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+      });
+  },
 
-  // Accept invitation
-  acceptInvitation: (token, userData) => apiClient.post(`/invites/accept/${token}`, userData),
+  // Accept invitation (PUBLIC)
+  acceptInvitation: (token, userData) => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+    return fetch(`${API_BASE}/invites/accept/${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => Promise.reject(err));
+      }
+      return response.json();
+    });
+  },
 
   // Get available roles for current user
   getAvailableRoles: () => apiClient.get('/invites/roles'),
@@ -22,10 +47,4 @@ export const inviteApi = {
 
   // Revoke invitation
   revokeInvitation: (id) => apiClient.delete(`/invites/${id}`),
-
-  // Get invite link details
-  getInviteLinkDetails: (token) => apiClient.get(`/invite-links/details/${token}`),
-
-  // Accept invite link
-  acceptInviteLink: (token, userData) => apiClient.post(`/invite-links/accept/${token}`, userData)
 };

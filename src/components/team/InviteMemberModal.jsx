@@ -8,11 +8,12 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  Link,
 } from "lucide-react";
-import { inviteApi } from "@/api/endpoints/inviteApi";
+import { inviteApi } from "@/api/inviteApi";
 import toast from "react-hot-toast";
 
-const InviteMemberModal = ({ isOpen, onClose }) => {
+const InviteMemberModal = ({ isOpen, onClose, onInviteSent }) => {
   const [inviteMethod, setInviteMethod] = useState("email");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableRoles, setAvailableRoles] = useState([]);
@@ -32,12 +33,14 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
   // Fetch available roles when modal opens
   useEffect(() => {
     const fetchRoles = async () => {
+      if (!isOpen) return;
+
       try {
         const roles = await inviteApi.getAvailableRoles();
         setAvailableRoles(roles);
         // Set default role to member if available
         const memberRole = roles.find((role) => role.name === "member");
-        if (memberRole) {
+        if (memberRole && !formData.roleId) {
           setFormData((prev) => ({ ...prev, roleId: memberRole.id }));
         }
       } catch (error) {
@@ -46,8 +49,13 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
       }
     };
 
-    if (isOpen) {
-      fetchRoles();
+    fetchRoles();
+  }, [isOpen]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
     }
   }, [isOpen]);
 
@@ -70,6 +78,7 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
   };
 
   const removeEmailField = (index) => {
+    if (formData.emails.length === 1) return;
     setFormData((prev) => ({
       ...prev,
       emails: prev.emails.filter((_, i) => i !== index),
@@ -125,6 +134,7 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
 
       if (successful > 0) {
         toast.success(`${successful} invitation(s) sent successfully!`);
+        onInviteSent && onInviteSent();
       }
       if (failed > 0) {
         toast.error(`${failed} invitation(s) failed to send`);
@@ -135,21 +145,21 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
         .filter((r) => r.status === "success")
         .map((r) => r.email);
 
-      setFormData((prev) => ({
-        ...prev,
-        emails: prev.emails.filter(
-          (email) => !successfulEmails.includes(email.trim().toLowerCase())
-        ),
-      }));
+      if (successfulEmails.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          emails: prev.emails.filter(
+            (email) =>
+              !successfulEmails.includes(email.trim().toLowerCase()) ||
+              !email.trim()
+          ),
+        }));
+      }
     } catch (error) {
       console.error("Error sending invitations:", error);
-      if (error.status === 429) {
-        toast.error("Too many invitations sent. Please try again later.");
-      } else if (error.status === 403) {
-        toast.error("You do not have permission to send invitations.");
-      } else {
-        toast.error("Failed to send invitations");
-      }
+      const errorMessage =
+        error.message || error.error || "Failed to send invitations";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -173,18 +183,16 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
       toast.success("Invite link generated successfully!");
     } catch (error) {
       console.error("Error generating invite link:", error);
-      if (error.status === 403) {
-        toast.error("You do not have permission to create invite links.");
-      } else {
-        toast.error("Failed to generate invite link");
-      }
+      const errorMessage =
+        error.message || error.error || "Failed to generate invite link";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const copyInviteLink = async () => {
-    if (!inviteLink) return;
+    if (!inviteLink?.link) return;
 
     try {
       await navigator.clipboard.writeText(inviteLink.link);
@@ -208,6 +216,7 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
     setInviteLink(null);
     setLinkCopied(false);
     setErrors({});
+    setInviteMethod("email");
   };
 
   if (!isOpen) return null;
@@ -220,7 +229,7 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
           onClick={onClose}
         />
 
-        <div className="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+        <div className="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <div className="flex items-center space-x-2">
@@ -243,23 +252,24 @@ const InviteMemberModal = ({ isOpen, onClose }) => {
               <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
                 <button
                   onClick={() => setInviteMethod("email")}
-                  className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+                  className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center ${
                     inviteMethod === "email"
                       ? "bg-white text-gray-900 shadow-sm"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  <Mail className="h-4 w-4 inline mr-2" />
+                  <Mail className="h-4 w-4 mr-2" />
                   Email Invite
                 </button>
                 <button
                   onClick={() => setInviteMethod("link")}
-                  className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+                  className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center ${
                     inviteMethod === "link"
                       ? "bg-white text-gray-900 shadow-sm"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
+                  <Link className="h-4 w-4 mr-2" />
                   Invite Link
                 </button>
               </div>
